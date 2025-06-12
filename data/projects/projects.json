@@ -1,0 +1,22 @@
+{
+  "projects": [
+    {
+      "id": "cfd-ml",
+      "title": "CFD-ML Integration",
+      "summary": "Neural network-based optimization for computational fluid dynamics simulations",
+      "image": "/projects/cfd-ml/images/Turbulence.jpg",
+      "content": "/projects/cfd-ml/index.md",
+      "category": "Research",
+      "techStack": ["Python", "PyTorch", "OpenFOAM"]
+    },
+    {
+      "id": "energy-flow",
+      "title": "Energy Flow Analysis",
+      "summary": "Advanced visualization and analysis of energy transfer in fluid systems",
+      "image": "/projects/energy-flow/images/cover.jpg",
+      "content": "/projects/energy-flow/index.md",
+      "category": "Project",
+      "techStack": ["C++", "ParaView", "OpenFOAM"]
+    }
+  ]
+}

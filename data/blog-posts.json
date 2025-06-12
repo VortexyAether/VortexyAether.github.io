@@ -1,0 +1,20 @@
+{
+  "posts": [
+    {
+      "id": "mesh-generation",
+      "title": "Mesh Generation Techniques for Accurate CFD",
+      "description": "Learn how to create high-quality meshes for reliable CFD simulations.",
+      "date": "2024-01-15",
+      "image": "/images/blog/mesh-generation.jpg",
+      "category": "CFD"
+    },
+    {
+      "id": "turbulence-modeling",
+      "title": "Turbulence Modeling in CFD: A Practical Guide",
+      "description": "A comprehensive guide to selecting and applying turbulence models in CFD.",
+      "date": "2024-02-01",
+      "image": "/images/blog/turbulence.jpg",
+      "category": "CFD"
+    }
+  ]
+}

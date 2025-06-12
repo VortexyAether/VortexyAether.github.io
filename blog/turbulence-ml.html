@@ -1,0 +1,64 @@
+
+<html>
+  <head>
+    <base href="/" />
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Public+Sans%3Awght%40400%3B500%3B700%3B900"
+    />
+    <title>Machine Learning in Turbulence Modeling - Vortexy Aether</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries,typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="/js/loadComponents.js"></script>
+    <script src="/js/loadBlogPost.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            typography: {
+              DEFAULT: {
+                css: {
+                  color: '#adadad',
+                  h1: { color: 'white' },
+                  h2: { color: 'white' },
+                  h3: { color: 'white' },
+                  h4: { color: 'white' },
+                  strong: { color: 'white' },
+                  code: { color: '#4F9BF4' },
+                  'code::before': { content: '""' },
+                  'code::after': { content: '""' },
+                  pre: { backgroundColor: '#363636' },
+                  a: { color: '#4F9BF4' },
+                  blockquote: { color: '#adadad' }
+                }
+              }
+            }
+          }
+        }
+      }
+    </script>
+  </head>
+  <body class="bg-[#1a1a1a]">
+    <div class="relative flex size-full min-h-screen flex-col bg-[#1a1a1a]" style='font-family: "Public Sans", "Noto Sans", sans-serif;'>
+      <div id="header"></div>
+      <div class="px-40 flex flex-1 justify-center py-5">
+        <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+          <article class="prose prose-lg max-w-none">
+            <!-- Blog content will be inserted here -->
+          </article>
+        </div>
+      </div>
+      <div id="footer"></div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        loadComponent('header', '/components/header.html');
+        loadComponent('footer', '/components/footer.html');
+        loadBlogPost();
+      });
+    </script>
+  </body>
+</html>

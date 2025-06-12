@@ -1,0 +1,84 @@
+<html>
+  <head>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link
+      rel="stylesheet"
+      as="style"
+      onload="this.rel='stylesheet'"
+      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Public+Sans%3Awght%40400%3B500%3B700%3B900"
+    />
+
+    <title>Stitch Design</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="/js/loadComponents.js"></script>
+    <script src="/js/loadFeaturedProjects.js"></script>
+    <script src="/js/loadBlogPosts.js"></script>
+  </head>
+  <body>
+    <div class="relative flex size-full min-h-screen flex-col bg-[#1a1a1a] dark group/design-root overflow-x-hidden" style='font-family: "Public Sans", "Noto Sans", sans-serif;'>
+      <!-- Header -->
+      <div id="header"></div>
+      
+      <!-- Main Content -->
+      <main class="flex-grow">
+        <div class="px-40 flex justify-center py-5">
+          <div class="max-w-[960px] w-full">
+            <!-- Your existing content -->
+            <div class="@container">
+              <div class="@[480px]:p-4">
+                <div
+                  class="flex min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded items-start justify-end px-4 pb-10 @[480px]:px-10"
+                  style='background-image: linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%), url("/images/Turbulence.jpg");'
+                >
+                  <div class="flex flex-col gap-2 text-left">
+                    <h1
+                      class="text-white text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]"
+                    >
+                      Hi, I'm Jaewon, study CFD-ML
+                    </h1>
+                    <h2 class="text-white text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal">
+                      I'm a Master studnet at Inha university, specializing in Computational Fluid Dynamics (CFD) and Machine Learning (ML). 
+                      My research focuses on applying Neural Networks techniques to enhance CFD simulations, enabling more efficient and accurate predictions of fluid dynamics phenomena. 
+                      I am passionate about leveraging data-driven approaches to solve complex engineering challenges and contribute to make the better world solving Energy problems.
+                      In the past, people believed the universe was filled with a fluid called 'Aether', and studied vortices to understand planetary orbits. 
+                      Similarly, I'm driven to unravel the mysteries of fluid dynamics—nature's grand energy transporter and classical mechanics' final frontier—to solve complex problems and contribute to a better world.
+                      I'm always excited to collaborate on challenging projects!
+                    </h2>
+                  </div>
+                  <button
+                    onclick="window.location.href='projects.html'"
+                    class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-white text-black text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]"
+                  >
+                    <span class="truncate">View Projects</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Featured Projects</h2>
+            <div id="featured-projects" class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
+              <!-- Projects will be dynamically loaded here -->
+            </div>
+            <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Blog</h2>
+            <div id="blog-container">
+              <!-- Blog posts will be dynamically loaded here -->
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <div id="footer"></div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        loadComponent('header', '/components/header.html');
+        loadComponent('footer', '/components/footer.html');
+        loadFeaturedProjects();
+        loadBlogPosts();
+      });
+    </script>
+  </body>
+</html>

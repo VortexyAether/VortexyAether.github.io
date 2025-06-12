@@ -1,0 +1,91 @@
+<html>
+  <head>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link
+      rel="stylesheet"
+      as="style"
+      onload="this.rel='stylesheet'"
+      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Public+Sans%3Awght%40400%3B500%3B700%3B900"
+    />
+    <title>Blog - Vortexy Aether</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="/js/loadComponents.js"></script>
+  </head>
+  <body>
+    <div class="relative flex size-full min-h-screen flex-col bg-[#1a1a1a] dark group/design-root overflow-x-hidden" style='font-family: "Public Sans", "Noto Sans", sans-serif;'>
+      <!-- Header -->
+      <div id="header"></div>
+      
+      <!-- Main Content -->
+      <main class="flex-grow">
+        <div class="px-40 flex justify-center py-5">
+          <div class="max-w-[960px] w-full">
+            <h1 class="text-white text-3xl font-bold mb-8">Blog Posts</h1>
+            
+            <!-- Blog Categories -->
+            <div class="flex gap-4 mb-8">
+              <button class="text-white bg-[#4F9BF4] px-4 py-2 rounded-full text-sm">All</button>
+              <button class="text-[#adadad] hover:text-white px-4 py-2 rounded-full text-sm">CFD-ML</button>
+              <button class="text-[#adadad] hover:text-white px-4 py-2 rounded-full text-sm">Research</button>
+              <button class="text-[#adadad] hover:text-white px-4 py-2 rounded-full text-sm">Projects</button>
+            </div>
+
+            <!-- Blog Posts Container -->
+            <div id="blog-posts-container" class="space-y-6">
+              <!-- Posts will be dynamically loaded here -->
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <div id="footer"></div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        loadComponent('header', '/components/header.html');
+        loadComponent('footer', '/components/footer.html');
+        loadAllBlogPosts();
+      });
+
+      async function loadAllBlogPosts() {
+        try {
+          const response = await fetch('/data/posts/posts.json');
+          const data = await response.json();
+          
+          const container = document.getElementById('blog-posts-container');
+          const posts = data.posts;
+          
+          posts.forEach(post => {
+            const postHtml = `
+              <div class="bg-[#363636] rounded-lg overflow-hidden">
+                <div class="flex">
+                  <div class="flex-[2] p-6">
+                    <div class="flex items-center gap-2 mb-2">
+                      <span class="text-[#4F9BF4] text-sm">${post.category}</span>
+                      <span class="text-[#adadad] text-sm">${post.date}</span>
+                    </div>
+                    <h2 class="text-white text-xl font-bold mb-2">${post.title}</h2>
+                    <p class="text-[#adadad] text-sm mb-4">${post.summary}</p>
+                    <a href="/blog/${post.id}.html" class="text-[#4F9BF4] hover:underline">
+                      Read more →
+                    </a>
+                  </div>
+                  <div class="w-1/3">
+                    <img src="${post.image}" alt="${post.title}" class="w-full h-full object-cover"/>
+                  </div>
+                </div>
+              </div>
+            `;
+            
+            container.innerHTML += postHtml;
+          });
+        } catch (error) {
+          console.error('Error loading blog posts:', error);
+        }
+      }
+    </script>
+  </body>
+</html>
