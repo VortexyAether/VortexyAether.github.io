@@ -12,6 +12,10 @@ async function loadComponent(elementId, componentPath) {
         link.classList.add('text-[#4F9BF4]');
       }
     });
+
+    // 컴포넌트 로드 완료 이벤트 발생
+    const event = new CustomEvent('componentLoaded', { detail: { elementId } });
+    document.dispatchEvent(event);
   } catch (error) {
     console.error('Error loading component:', error);
   }

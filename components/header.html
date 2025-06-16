@@ -5,9 +5,14 @@
         <img src="/images/vortex.png" alt="stylized swirling vortex logo representing Vortexy Aether with a dynamic and energetic design on a neutral background" class="w-full h-full object-cover"/>
       </a>
     </div>
-    <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">Vortexy Aether</h2>
+    <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">
+      <a href="index.html" class="text-white !text-white">Vortexy Aether</a>
+    </h2>
   </div>
-  <div class="flex flex-1 justify-end gap-8">
+  
+
+  <!-- 데스크탑 메뉴 -->
+  <div class="hidden md:flex flex-1 justify-end gap-8">
     <div class="flex items-center gap-9">
       <a class="text-white text-sm font-medium leading-normal" href="index.html">Home</a>
       <a class="text-white text-sm font-medium leading-normal" href="projects.html">Projects</a>
@@ -17,6 +22,25 @@
       <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
            style='background-image: url("/images/profile.png");'>
       </div>
+    </div>
+  </div>
+
+
+  <!-- 모바일 햄버거 메뉴 -->
+  <button id="hamburger-menu" class="mobile-menu md:hidden">☰</button>
+
+  <!-- 모바일 메뉴(사이드바) -->
+  <div id="mobile-menu"
+       class="fixed top-0 right-0 h-full w-64 bg-[#1a1a1a] text-white p-6 z-50 flex flex-col gap-8 transition-transform duration-300"
+       style="transform: translateX(100%); overflow: hidden;">
+    <button id="close-menu" class="text-xl absolute top-4 right-4 font-normal">✖</button>
+    <ul class="flex flex-col gap-6 mt-12">
+      <li><a href="/blog.html" class="text-lg">Blog</a></li>
+      <li><a href="/contact.html" class="text-lg">Contact</a></li>
+      <li><a href="/projects.html" class="text-lg">Projects</a></li>
+    </ul>
+    <div class="mt-auto flex justify-center">
+      <img src="/images/profile.png" alt="Profile" class="w-16 h-16 rounded-full object-cover border-2 border-[#363636]"/>
     </div>
   </div>
 </header>

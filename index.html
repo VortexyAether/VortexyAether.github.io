@@ -1,5 +1,7 @@
 <html>
   <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
     <link
       rel="stylesheet"
@@ -15,6 +17,8 @@
     <script src="/js/loadComponents.js"></script>
     <script src="/js/loadFeaturedProjects.js"></script>
     <script src="/js/loadBlogPosts.js"></script>
+    <script src="/js/mobileMenu.js" defer></script>
+    <link rel="stylesheet" href="/css/styles.css">
   </head>
   <body>
     <div class="relative flex size-full min-h-screen flex-col bg-[#1a1a1a] dark group/design-root overflow-x-hidden" style='font-family: "Public Sans", "Noto Sans", sans-serif;'>
@@ -23,8 +27,8 @@
       
       <!-- Main Content -->
       <main class="flex-grow">
-        <div class="px-40 flex justify-center py-5">
-          <div class="max-w-[960px] w-full">
+        <div class="px-4 sm:px-6 md:px-8 lg:px-40 flex justify-center py-5">
+          <div class="w-full max-w-[960px]">
             <!-- Your existing content -->
             <div class="@container">
               <div class="@[480px]:p-4">
@@ -34,11 +38,11 @@
                 >
                   <div class="flex flex-col gap-2 text-left">
                     <h1
-                      class="text-white text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]"
+                      class="text-white text-3xl sm:text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]"
                     >
                       Hi, I'm Jaewon, study CFD-ML
                     </h1>
-                    <h2 class="text-white text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal">
+                    <h2 class="text-white text-sm sm:text-base font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal">
                       I'm a Master studnet at Inha university, specializing in Computational Fluid Dynamics (CFD) and Machine Learning (ML). 
                       My research focuses on applying Neural Networks techniques to enhance CFD simulations, enabling more efficient and accurate predictions of fluid dynamics phenomena. 
                       I am passionate about leveraging data-driven approaches to solve complex engineering challenges and contribute to make the better world solving Energy problems.
@@ -56,12 +60,12 @@
                 </div>
               </div>
             </div>
-            <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Featured Projects</h2>
-            <div id="featured-projects" class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
+            <h2 class="text-white text-[20px] sm:text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Featured Projects</h2>
+            <div id="featured-projects" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 p-4">
               <!-- Projects will be dynamically loaded here -->
             </div>
-            <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Blog</h2>
-            <div id="blog-container">
+            <h2 class="text-white text-[20px] sm:text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Blog</h2>
+            <div id="blog-container" class="px-4">
               <!-- Blog posts will be dynamically loaded here -->
             </div>
           </div>

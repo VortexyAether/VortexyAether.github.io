@@ -12,7 +12,7 @@ Developing a novel approach to integrate machine learning with computational flu
 ## Technical Details
 
 ### Architecture
-![Neural Network Architecture](./images/Turbulence.jpg)
+![Neural Network Architecture](./projects/cfd-ml/turbulence2.jpg)
 
 The neural network architecture consists of:
 - Input layer: Flow field parameters (velocity, pressure, etc.)

@@ -5,7 +5,7 @@
       "title": "Machine Learning in Turbulence Modeling",
       "date": "2024-01-15",
       "summary": "Exploring how machine learning is revolutionizing turbulence modeling in CFD",
-      "image": "/blog/turbulence-ml/images/turbulence-ml.png",
+      "image": "/blog/turbulence-ml/turbulence-ml.png",
       "content": "/blog/turbulence-ml/index.md",
       "category": "CFD-ML"
     }

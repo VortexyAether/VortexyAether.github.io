@@ -1,17 +1,22 @@
-
 <html>
   <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base href="/" />
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Public+Sans%3Awght%40400%3B500%3B700%3B900"
+      as="style"
+      onload="this.rel='stylesheet'"
+      href="https://fonts.googleapis.com/css2?display=swap&family=Noto+Sans:wght@400;500;700;900&family=Public+Sans:wght@400;500;700;900"
     />
     <title>Machine Learning in Turbulence Modeling - Vortexy Aether</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries,typography"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="/js/loadComponents.js"></script>
+    <script src="/js/mobileMenu.js" defer></script>
+    <link rel="stylesheet" href="/css/styles.css">
     <script src="/js/loadBlogPost.js"></script>
     <script>
       tailwind.config = {
@@ -41,18 +46,19 @@
     </script>
   </head>
   <body class="bg-[#1a1a1a]">
-    <div class="relative flex size-full min-h-screen flex-col bg-[#1a1a1a]" style='font-family: "Public Sans", "Noto Sans", sans-serif;'>
+    <div class="relative flex size-full min-h-screen flex-col bg-[#1a1a1a] dark group/design-root overflow-x-hidden" style='font-family: "Public Sans", "Noto Sans", sans-serif;'>
       <div id="header"></div>
-      <div class="px-40 flex flex-1 justify-center py-5">
-        <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
-          <article class="prose prose-lg max-w-none">
-            <!-- Blog content will be inserted here -->
-          </article>
+      <main class="flex-grow">
+        <div class="px-4 sm:px-6 md:px-8 lg:px-40 flex justify-center py-5">
+          <div class="max-w-[960px] w-full">
+            <article class="prose prose-lg max-w-none">
+              <!-- Blog content will be inserted here -->
+            </article>
+          </div>
         </div>
-      </div>
+      </main>
       <div id="footer"></div>
     </div>
-
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         loadComponent('header', '/components/header.html');

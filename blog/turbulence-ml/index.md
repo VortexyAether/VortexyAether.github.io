@@ -1,6 +1,6 @@
 # Machine Learning in Turbulence Modeling
 
-![Turbulence Simulation](./images/turbulence-ml.png)
+![Turbulence Simulation](./blog/turbulence-ml/turbulence-ml.png)
 
 Published on January 15, 2024 by Jaewon Jang
 
