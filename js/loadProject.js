@@ -30,6 +30,9 @@ async function loadProject() {
             `;
             articleContainer.innerHTML = headerHtml + html;
             articleContainer.classList.add('prose-invert');
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([articleContainer]);
+            }
         }
     } catch (error) {
         console.error('Error loading project:', error);

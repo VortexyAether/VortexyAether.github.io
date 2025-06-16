@@ -10,13 +10,13 @@
       "techStack": ["Python", "PyTorch", "OpenFOAM"]
     },
     {
-      "id": "energy-flow",
-      "title": "Energy Flow Analysis",
-      "summary": "Advanced visualization and analysis of energy transfer in fluid systems",
-      "image": "/projects/energy-flow/cover.jpg",
-      "content": "/projects/energy-flow/index.md",
+      "id": "under_graduated",
+      "title": "My beautiful Undergraduate",
+      "summary": "A collection of my undergraduate projects and experiences",
+      "image": "/projects/under_graduated/object_detection.gif",
+      "content": "/projects/under_graduated/index.md",
       "category": "Project",
-      "techStack": ["C++", "ParaView", "OpenFOAM"]
+      "techStack": ["YOLO", "Python", "PINN", "OpenCV", "NodeRED"]
     }
   ]
 }
