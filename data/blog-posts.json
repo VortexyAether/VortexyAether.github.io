@@ -1,6 +1,14 @@
 {
   "posts": [
     {
+      "id": "ai-powered-cae",
+      "title": "The AI Revolution in CAE: From GenCAD to LLM-Powered Engineering Tools",
+      "description": "Exploring how AI is transforming CAE workflows through GenCAD's image-to-CAD generation, LLM-powered FreeCAD, and conversational OpenFOAM control.",
+      "date": "2025-07-13",
+      "image": "/blog/ai-powered-cae/ai-cae-header.jpg",
+      "category": "AI & CAE"
+    },
+    {
       "id": "mesh-generation",
       "title": "Mesh Generation Techniques for Accurate CFD",
       "description": "Learn how to create high-quality meshes for reliable CFD simulations.",

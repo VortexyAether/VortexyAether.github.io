@@ -1,6 +1,15 @@
 {
   "posts": [
     {
+      "id": "ai-powered-cae",
+      "title": "MCP and AI-Powered CFD: From Geometry (GenCAD) to Analysis (OpenFOAM)",
+      "date": "2025-07-13",
+      "summary": "How Model Context Protocol (MCP) is revolutionizing CFD workflows from geometry creation to fluid analysis, despite slow adoption in engineering tools backed by Google and Anthropic.",
+      "image": "/blog/ai-powered-cae/ai-cae-header.png",
+      "content": "/blog/ai-powered-cae/index.md",
+      "category": "CFD-AI"
+    },
+    {
       "id": "turbulence-ml",
       "title": "Machine Learning in Turbulence Modeling",
       "date": "2024-01-15",
