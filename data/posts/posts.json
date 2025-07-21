@@ -1,21 +1,21 @@
 {
   "posts": [
     {
+      "id": "turbulence-pinn",
+      "title": "PINN in CFD",
+      "date": "2024-01-15",
+      "summary": "Exploring how Physics informed Neural Networks is revolutionizing Computational Fluid Dynamics (CFD).",
+      "image": "/blog/turbulence-pinn/turbulence-pinn.png",
+      "content": "/blog/turbulence-pinn/index.md",
+      "category": "CFD-ML"
+    },
+    {
       "id": "ai-powered-cae",
       "title": "MCP and AI-Powered CFD: From Geometry (GenCAD) to Analysis (OpenFOAM)",
       "date": "2025-07-13",
       "summary": "How Model Context Protocol (MCP) is revolutionizing CFD workflows from geometry creation to fluid analysis, despite slow adoption in engineering tools backed by Google and Anthropic.",
       "image": "/blog/ai-powered-cae/ai-cae-header.png",
       "content": "/blog/ai-powered-cae/index.md",
-      "category": "CFD-AI"
-    },
-    {
-      "id": "turbulence-ml",
-      "title": "Machine Learning in Turbulence Modeling",
-      "date": "2024-01-15",
-      "summary": "Exploring how machine learning is revolutionizing turbulence modeling in CFD",
-      "image": "/blog/turbulence-ml/turbulence-ml.png",
-      "content": "/blog/turbulence-ml/index.md",
       "category": "CFD-ML"
     }
   ]
