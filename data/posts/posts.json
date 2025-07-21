@@ -3,7 +3,7 @@
     {
       "id": "turbulence-pinn",
       "title": "PINN in CFD",
-      "date": "2024-01-15",
+      "date": "2025-07-21",
       "summary": "Exploring how Physics informed Neural Networks is revolutionizing Computational Fluid Dynamics (CFD).",
       "image": "/blog/turbulence-pinn/turbulence-pinn.png",
       "content": "/blog/turbulence-pinn/index.md",
