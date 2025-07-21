@@ -7,7 +7,7 @@
       "image": "/projects/under_graduated/object_detection.gif",
       "content": "/projects/under_graduated/index.md",
       "category": "Project",
-      "techStack": ["YOLO", "Python", "PINN", "OpenCV", "NodeRED"]
+      "techStack": ["YOLO", "Python1", "PINN", "OpenCV", "NodeRED"]
     }
   ]
 }
