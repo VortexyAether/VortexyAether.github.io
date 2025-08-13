@@ -104,7 +104,12 @@
 
         <!-- Archive Content (Hidden initially) -->
         <div id="archiveContent" class="hidden">
-            <h1 class="text-4xl font-bold text-white mb-8">Archive</h1>
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-4xl font-bold text-white">Archive</h1>
+                <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm">
+                    Logout
+                </button>
+            </div>
 
             <!-- Status Bar -->
             <div id="statusBar" class="bg-blue-900 bg-opacity-20 border border-blue-600 rounded-lg p-4 mb-8 hidden">
@@ -211,8 +216,21 @@ console.log('Hello World');
 
         // 페이지 로드 시 초기화
         window.addEventListener('DOMContentLoaded', async () => {
-            // 이미 인증된 경우 체크
-            if (sessionStorage.getItem('archiveAuth') === 'true') {
+            // Supabase 먼저 초기화
+            await new Promise(resolve => setTimeout(resolve, 100));
+            archiveManager = new SupabaseArchiveManager();
+            
+            // 이미 인증된 경우 체크 (sessionStorage + localStorage 모두 확인)
+            const sessionAuth = sessionStorage.getItem('archiveAuth');
+            const persistentAuth = localStorage.getItem('archiveAuth');
+            
+            if (sessionAuth === 'true' || persistentAuth === 'true') {
+                // 인증 상태를 모든 저장소에 동기화
+                sessionStorage.setItem('archiveAuth', 'true');
+                localStorage.setItem('archiveAuth', 'true');
+                
+                document.getElementById('passwordModal').style.display = 'none';
+                document.getElementById('archiveContent').classList.remove('hidden');
                 await initializeArchive();
             }
             
@@ -260,7 +278,11 @@ console.log('Hello World');
                 }
                 
                 if (data === true) {
+                    // 세션과 영구 저장소 모두에 저장 (브라우저 닫아도 유지)
                     sessionStorage.setItem('archiveAuth', 'true');
+                    localStorage.setItem('archiveAuth', 'true');
+                    localStorage.setItem('archiveAuthTime', Date.now().toString()); // 인증 시간 저장
+                    
                     document.getElementById('passwordModal').style.display = 'none';
                     document.getElementById('archiveContent').classList.remove('hidden');
                     await initializeArchive();
@@ -279,9 +301,7 @@ console.log('Hello World');
         }
 
         async function initializeArchive() {
-            // Supabase 초기화
-            await new Promise(resolve => setTimeout(resolve, 100));
-            archiveManager = new SupabaseArchiveManager();
+            // archiveManager가 이미 초기화되어 있음
             
             // 익명 사용자로 로그인 (항상 같은 익명 사용자 사용)
             try {
@@ -290,16 +310,19 @@ console.log('Hello World');
                 const anonymousPassword = 'archive_anonymous_2024';
                 
                 try {
-                    const { user } = await archiveManager.signIn(anonymousEmail, anonymousPassword);
-                    anonymousUser = user;
+                    const result = await archiveManager.signIn(anonymousEmail, anonymousPassword);
+                    anonymousUser = result.user;
+                    console.log('익명 사용자 로그인 성공:', anonymousUser?.id);
                 } catch (error) {
+                    console.log('익명 계정 생성 시도:', error.message);
                     // 계정이 없으면 생성
                     try {
                         await archiveManager.signUp(anonymousEmail, anonymousPassword);
-                        const { user } = await archiveManager.signIn(anonymousEmail, anonymousPassword);
-                        anonymousUser = user;
+                        const result = await archiveManager.signIn(anonymousEmail, anonymousPassword);
+                        anonymousUser = result.user;
+                        console.log('익명 사용자 생성 후 로그인:', anonymousUser?.id);
                     } catch (signupError) {
-                        console.log('Using local storage fallback');
+                        console.log('Using local storage fallback:', signupError.message);
                         anonymousUser = null;
                     }
                 }
@@ -309,7 +332,7 @@ console.log('Hello World');
                 await loadNotes();
                 
             } catch (error) {
-                console.log('Using local storage fallback');
+                console.log('Using local storage fallback:', error);
                 anonymousUser = null;
                 loadLocalData();
             }
@@ -587,18 +610,30 @@ console.log('Hello World');
         }
 
         async function downloadFile(filePath, fileName) {
-            if (!anonymousUser) return;
+            if (!anonymousUser) {
+                showStatus('Please wait, connecting to storage...', 'info');
+                return;
+            }
             
             try {
+                showStatus(`Preparing download: ${fileName}`, 'info');
                 const url = await archiveManager.getDownloadUrl(filePath);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+                
+                // 새 창에서 다운로드 (더 안정적)
+                const downloadLink = document.createElement('a');
+                downloadLink.href = url;
+                downloadLink.download = fileName;
+                downloadLink.target = '_blank';
+                downloadLink.style.display = 'none';
+                
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                
+                showStatus(`Download started: ${fileName}`, 'success');
             } catch (error) {
-                showStatus(`Error downloading file: ${error.message}`, 'error');
+                console.error('Download error:', error);
+                showStatus(`Download failed: ${error.message}`, 'error');
             }
         }
 
@@ -701,6 +736,19 @@ console.log('Hello World');
                 closeNoteModal();
             }
         });
+
+        // 로그아웃 기능
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // 모든 인증 정보 제거
+                sessionStorage.removeItem('archiveAuth');
+                localStorage.removeItem('archiveAuth');
+                localStorage.removeItem('archiveAuthTime');
+                
+                // 페이지 새로고침으로 로그인 화면 복원
+                location.reload();
+            }
+        }
 
         // ESC 키로 모달 닫기
         document.addEventListener('keydown', (e) => {
