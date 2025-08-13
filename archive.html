@@ -65,19 +65,36 @@
     <div id="header-placeholder"></div>
 
     <main class="container mx-auto px-4 py-8 max-w-6xl">
-        <!-- Password Protection Modal -->
-        <div id="passwordModal" class="fixed inset-0 bg-black bg-opacity-50 modal-bg flex items-center justify-center z-50">
+        <!-- Authentication Modal -->
+        <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 modal-bg flex items-center justify-center z-50">
             <div class="bg-gray-800 p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
                 <h2 class="text-2xl font-bold text-white mb-4">Archive Access</h2>
-                <p class="text-gray-400 mb-6">This section is password protected. Please enter the password to continue.</p>
-                <input type="password" id="passwordInput" 
-                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                    placeholder="Enter password">
-                <div id="passwordError" class="text-red-500 text-sm mt-2 hidden">Incorrect password. Please try again.</div>
-                <button onclick="checkPassword()" 
-                    class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
-                    Submit
-                </button>
+                
+                <!-- Login/Signup Toggle -->
+                <div class="flex mb-6">
+                    <button id="loginTab" class="flex-1 py-2 px-4 bg-blue-600 text-white rounded-l-lg">Sign In</button>
+                    <button id="signupTab" class="flex-1 py-2 px-4 bg-gray-600 text-gray-300 rounded-r-lg">Sign Up</button>
+                </div>
+
+                <!-- Auth Form -->
+                <form id="authForm">
+                    <input type="email" id="authEmail" required
+                        class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white mb-4 focus:outline-none focus:border-blue-500"
+                        placeholder="Email address">
+                    <input type="password" id="authPassword" required
+                        class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white mb-4 focus:outline-none focus:border-blue-500"
+                        placeholder="Password (min 6 characters)">
+                    <div id="authError" class="text-red-500 text-sm mb-4 hidden"></div>
+                    <div id="authSuccess" class="text-green-500 text-sm mb-4 hidden"></div>
+                    <button type="submit" id="authSubmit"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
+                        Sign In
+                    </button>
+                </form>
+                
+                <div class="mt-4 text-center">
+                    <p class="text-gray-400 text-sm">Only invited users can access this archive</p>
+                </div>
             </div>
         </div>
 
@@ -106,9 +123,12 @@
         <div id="archiveContent" class="hidden">
             <div class="flex justify-between items-center mb-8">
                 <h1 class="text-4xl font-bold text-white">Archive</h1>
-                <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm">
-                    Logout
-                </button>
+                <div class="flex items-center gap-4">
+                    <span id="userEmail" class="text-gray-400"></span>
+                    <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm">
+                        Logout
+                    </button>
+                </div>
             </div>
 
             <!-- Status Bar -->
@@ -208,52 +228,40 @@ console.log('Hello World');
     <script src="js/loadComponents.js"></script>
     <script src="js/mobileMenu.js"></script>
     <script>
-        // Archive 관리 변수들
-        let archiveManager = null;
-        let anonymousUser = null;
-        let isPreviewMode = false;
-        let supabaseClient = null;
-        
-        // Supabase 클라이언트 초기화
+        // Supabase 설정
         const SUPABASE_URL = 'https://kbciqteoeanrssxclwtt.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtiY2lxdGVvZWFucnNzeGNsd3R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwNzc1MDMsImV4cCI6MjA3MDY1MzUwM30.URgrlom7TXpdpI7bpzOhgUl-4s02Pq-FVPpL28NaB6U';
         
-        // Supabase 초기화 시도
+        let supabase;
+        let currentUser = null;
+        let currentNotes = [];
+        let isPreviewMode = false;
+        let isLogin = true;
+
+        // Supabase 초기화
         try {
             if (typeof window.supabase !== 'undefined') {
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('Supabase client initialized successfully');
-            } else {
-                console.warn('Supabase library not loaded, using local storage only');
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase initialized successfully');
             }
         } catch (error) {
-            console.warn('Supabase initialization failed:', error);
+            console.error('Supabase initialization failed:', error);
         }
 
         // 페이지 로드 시 초기화
         window.addEventListener('DOMContentLoaded', async () => {
-            // Supabase 먼저 초기화
-            await new Promise(resolve => setTimeout(resolve, 100));
-            archiveManager = new SupabaseArchiveManager();
-            
-            // 이미 인증된 경우 체크 (sessionStorage + localStorage 모두 확인)
-            const sessionAuth = sessionStorage.getItem('archiveAuth');
-            const persistentAuth = localStorage.getItem('archiveAuth');
-            
-            if (sessionAuth === 'true' || persistentAuth === 'true') {
-                // 인증 상태를 모든 저장소에 동기화
-                sessionStorage.setItem('archiveAuth', 'true');
-                localStorage.setItem('archiveAuth', 'true');
-                
-                document.getElementById('passwordModal').style.display = 'none';
-                document.getElementById('archiveContent').classList.remove('hidden');
-                await initializeArchive();
+            // 현재 사용자 확인
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                showArchiveContent(user);
             }
             
-            // 엔터키 지원
-            document.getElementById('passwordInput').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    checkPassword();
+            // 인증 상태 변경 리스너
+            supabase.auth.onAuthStateChange((event, session) => {
+                if (session?.user) {
+                    showArchiveContent(session.user);
+                } else {
+                    showAuthModal();
                 }
             });
 
@@ -261,109 +269,135 @@ console.log('Hello World');
         });
 
         function setupEventListeners() {
+            // Auth tab switching
+            document.getElementById('loginTab').addEventListener('click', () => {
+                isLogin = true;
+                updateAuthUI();
+            });
+
+            document.getElementById('signupTab').addEventListener('click', () => {
+                isLogin = false;
+                updateAuthUI();
+            });
+
+            // Auth form submission
+            document.getElementById('authForm').addEventListener('submit', handleAuth);
+
             // File upload
             document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+
             // Drag and drop
             setupDragAndDrop();
         }
 
-        async function checkPassword() {
-            const input = document.getElementById('passwordInput').value;
-            const error = document.getElementById('passwordError');
-            
-            console.log('Checking password...', input); // 디버그
-            
-            if (!input.trim()) {
-                error.textContent = 'Please enter a password';
-                error.classList.remove('hidden');
-                return;
+        function updateAuthUI() {
+            const loginTab = document.getElementById('loginTab');
+            const signupTab = document.getElementById('signupTab');
+            const submitBtn = document.getElementById('authSubmit');
+
+            if (isLogin) {
+                loginTab.className = 'flex-1 py-2 px-4 bg-blue-600 text-white rounded-l-lg';
+                signupTab.className = 'flex-1 py-2 px-4 bg-gray-600 text-gray-300 rounded-r-lg';
+                submitBtn.textContent = 'Sign In';
+            } else {
+                loginTab.className = 'flex-1 py-2 px-4 bg-gray-600 text-gray-300 rounded-l-lg';
+                signupTab.className = 'flex-1 py-2 px-4 bg-blue-600 text-white rounded-r-lg';
+                submitBtn.textContent = 'Sign Up';
             }
+        }
+
+        async function handleAuth(e) {
+            e.preventDefault();
             
-            // 간단한 비밀번호 체크
-            if (input === 'archive2024') {
-                console.log('Password correct, logging in...');
-                
-                // 인증 정보 저장
-                sessionStorage.setItem('archiveAuth', 'true');
-                localStorage.setItem('archiveAuth', 'true');
-                localStorage.setItem('archiveAuthTime', Date.now().toString());
-                
-                // UI 업데이트
-                document.getElementById('passwordModal').style.display = 'none';
-                document.getElementById('archiveContent').classList.remove('hidden');
-                error.classList.add('hidden');
-                
-                // Archive 초기화
-                try {
-                    await initializeArchive();
-                    console.log('Archive initialized successfully');
-                } catch (initError) {
-                    console.error('Archive initialization failed:', initError);
-                    // 초기화 실패해도 UI는 표시
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const errorDiv = document.getElementById('authError');
+            const successDiv = document.getElementById('authSuccess');
+
+            // 에러/성공 메시지 숨김
+            errorDiv.classList.add('hidden');
+            successDiv.classList.add('hidden');
+
+            try {
+                if (isLogin) {
+                    // 로그인
+                    const { data, error } = await supabase.auth.signInWithPassword({
+                        email,
+                        password,
+                    });
+                    
+                    if (error) throw error;
+                    
+                } else {
+                    // 회원가입 전 이메일 화이트리스트 체크
+                    const { data: isAllowed, error: checkError } = await supabase
+                        .rpc('is_email_allowed', { user_email: email });
+                    
+                    if (checkError) {
+                        throw new Error('Unable to verify email permission');
+                    }
+                    
+                    if (!isAllowed) {
+                        throw new Error('This email is not authorized to access the archive. Please contact the administrator.');
+                    }
+                    
+                    // 허용된 이메일이면 가입 진행
+                    const { data, error } = await supabase.auth.signUp({
+                        email,
+                        password,
+                    });
+                    
+                    if (error) throw error;
+                    
+                    if (data.user && !data.user.email_confirmed_at) {
+                        successDiv.textContent = 'Please check your email to verify your account, then sign in.';
+                        successDiv.classList.remove('hidden');
+                        // 가입 후 로그인 탭으로 전환
+                        isLogin = true;
+                        updateAuthUI();
+                    }
                 }
                 
-                return;
-            }
-            
-            // 비밀번호 틀림
-            console.log('Incorrect password');
-            error.textContent = 'Incorrect password. Please try again.';
-            error.classList.remove('hidden');
-            document.getElementById('passwordInput').value = '';
-        }
-
-        async function initializeArchive() {
-            console.log('Initializing archive...');
-            
-            // 일단 로컬 데이터로 시작
-            try {
-                loadLocalData();
-                console.log('Local data loaded successfully');
             } catch (error) {
-                console.error('Failed to load local data:', error);
-                // 빈 상태로라도 표시
-                displayFiles([]);
-                displayNotes([]);
+                errorDiv.textContent = error.message;
+                errorDiv.classList.remove('hidden');
             }
         }
 
-        function togglePreview() {
-            const textarea = document.getElementById('postContent');
-            const preview = document.getElementById('markdownPreview');
-            const toggleBtn = document.getElementById('previewToggle');
+        function showAuthModal() {
+            document.getElementById('authModal').style.display = 'flex';
+            document.getElementById('archiveContent').classList.add('hidden');
+        }
+
+        function showArchiveContent(user) {
+            currentUser = user;
+            document.getElementById('authModal').style.display = 'none';
+            document.getElementById('archiveContent').classList.remove('hidden');
+            document.getElementById('userEmail').textContent = user.email;
             
-            if (isPreviewMode) {
-                // Switch to edit mode
-                textarea.classList.remove('hidden');
-                preview.classList.add('hidden');
-                toggleBtn.textContent = 'Preview';
-                isPreviewMode = false;
-            } else {
-                // Switch to preview mode
-                const markdown = textarea.value;
-                const html = marked.parse(markdown);
-                preview.innerHTML = html;
-                textarea.classList.add('hidden');
-                preview.classList.remove('hidden');
-                toggleBtn.textContent = 'Edit';
-                isPreviewMode = true;
+            // 데이터 로드
+            loadFiles();
+            loadNotes();
+        }
+
+        async function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                try {
+                    await supabase.auth.signOut();
+                } catch (error) {
+                    console.error('Logout error:', error);
+                }
             }
         }
 
+        // 파일 업로드
         async function handleFileUpload(e) {
             const files = e.target.files;
             
             for (let file of files) {
                 try {
                     showStatus(`Uploading ${file.name}...`, 'info');
-                    
-                    if (anonymousUser) {
-                        await archiveManager.uploadFile(file);
-                    } else {
-                        // 로컬 저장
-                        saveLocalFile(file);
-                    }
-                    
+                    const fileData = await uploadFile(file);
                     showStatus(`${file.name} uploaded successfully!`, 'success');
                 } catch (error) {
                     showStatus(`Error uploading ${file.name}: ${error.message}`, 'error');
@@ -371,9 +405,39 @@ console.log('Hello World');
             }
             
             e.target.value = '';
-            await loadFiles();
+            loadFiles();
         }
 
+        async function uploadFile(file) {
+            if (!currentUser) throw new Error('Not authenticated');
+            
+            // 파일 크기 체크
+            if (file.size > 50 * 1024 * 1024) {
+                throw new Error('File size exceeds 50MB limit');
+            }
+
+            // 파일 경로
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}_${file.name}`;
+            const filePath = `${currentUser.id}/${fileName}`;
+
+            const { data, error } = await supabase.storage
+                .from('archive-files')
+                .upload(filePath, file);
+
+            if (error) throw error;
+
+            return {
+                id: Date.now(),
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                path: filePath,
+                uploadDate: new Date().toISOString()
+            };
+        }
+
+        // 드래그 앤 드롭
         function setupDragAndDrop() {
             const dropZone = document.querySelector('.border-dashed').parentElement;
             
@@ -394,25 +458,20 @@ console.log('Hello World');
                 for (let file of files) {
                     try {
                         showStatus(`Uploading ${file.name}...`, 'info');
-                        
-                        if (anonymousUser) {
-                            await archiveManager.uploadFile(file);
-                        } else {
-                            saveLocalFile(file);
-                        }
-                        
+                        await uploadFile(file);
                         showStatus(`${file.name} uploaded successfully!`, 'success');
                     } catch (error) {
                         showStatus(`Error uploading ${file.name}: ${error.message}`, 'error');
                     }
                 }
                 
-                await loadFiles();
+                loadFiles();
             });
         }
 
+        // 노트 저장
         async function saveNote() {
-            const author = document.getElementById('postAuthor').value || 'Anonymous';
+            const author = document.getElementById('postAuthor').value || currentUser?.email || 'Anonymous';
             const title = document.getElementById('postTitle').value;
             const content = document.getElementById('postContent').value;
 
@@ -422,40 +481,56 @@ console.log('Hello World');
             }
 
             try {
-                if (anonymousUser) {
-                    await archiveManager.createNote(title, content, author);
-                } else {
-                    // 로컬 저장
-                    saveLocalNote({ title, content, author });
-                }
-                
-                // Clear form
+                const { data, error } = await supabase
+                    .from('notes')
+                    .insert([{
+                        title,
+                        content,
+                        author,
+                        user_id: currentUser.id
+                    }])
+                    .select();
+
+                if (error) throw error;
+
+                // 폼 클리어
                 document.getElementById('postAuthor').value = '';
                 document.getElementById('postTitle').value = '';
                 document.getElementById('postContent').value = '';
                 
-                // Reset preview mode
                 if (isPreviewMode) {
                     togglePreview();
                 }
                 
                 showStatus('Note saved successfully!', 'success');
-                await loadNotes();
+                loadNotes();
             } catch (error) {
                 showStatus(`Error saving note: ${error.message}`, 'error');
             }
         }
 
+        // 파일 목록 로드
         async function loadFiles() {
             try {
-                let files = [];
-                
-                if (anonymousUser) {
-                    files = await archiveManager.getFiles();
-                } else {
-                    files = JSON.parse(localStorage.getItem('archiveFiles') || '[]');
-                }
-                
+                const { data, error } = await supabase.storage
+                    .from('archive-files')
+                    .list(currentUser.id, {
+                        limit: 100,
+                        offset: 0,
+                        sortBy: { column: 'created_at', order: 'desc' }
+                    });
+
+                if (error) throw error;
+
+                const files = data.map(file => ({
+                    id: file.id,
+                    name: file.name.replace(/^\d+_/, ''),
+                    size: file.metadata?.size || 0,
+                    type: file.metadata?.mimetype || '',
+                    path: `${currentUser.id}/${file.name}`,
+                    uploadDate: file.created_at
+                }));
+
                 displayFiles(files);
             } catch (error) {
                 document.getElementById('filesList').innerHTML = 
@@ -463,23 +538,25 @@ console.log('Hello World');
             }
         }
 
+        // 노트 목록 로드
         async function loadNotes() {
             try {
-                let notes = [];
-                
-                if (anonymousUser) {
-                    notes = await archiveManager.getNotes();
-                } else {
-                    notes = JSON.parse(localStorage.getItem('archivePosts') || '[]');
-                }
-                
-                displayNotes(notes);
+                const { data, error } = await supabase
+                    .from('notes')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                displayNotes(data);
             } catch (error) {
                 document.getElementById('notesList').innerHTML = 
                     `<p class="text-red-400">Error loading notes: ${error.message}</p>`;
             }
         }
 
+        // 파일 목록 표시
         function displayFiles(files) {
             const filesList = document.getElementById('filesList');
             
@@ -496,16 +573,16 @@ console.log('Hello World');
                         </svg>
                         <div>
                             <p class="text-white font-medium">${file.name}</p>
-                            <p class="text-gray-400 text-sm">${formatFileSize(file.size)} • ${formatDate(file.uploadDate || file.created_at)}</p>
+                            <p class="text-gray-400 text-sm">${formatFileSize(file.size)} • ${formatDate(file.uploadDate)}</p>
                         </div>
                     </div>
                     <div class="flex gap-2">
-                        ${file.path ? `<button onclick="downloadFile('${file.path}', '${file.name}')" class="text-blue-400 hover:text-blue-300">
+                        <button onclick="downloadFile('${file.path}', '${file.name}')" class="text-blue-400 hover:text-blue-300">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                             </svg>
-                        </button>` : ''}
-                        <button onclick="deleteFile('${file.path || file.id}')" class="text-red-400 hover:text-red-300">
+                        </button>
+                        <button onclick="deleteFile('${file.path}')" class="text-red-400 hover:text-red-300">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                             </svg>
@@ -515,9 +592,10 @@ console.log('Hello World');
             `).join('');
         }
 
+        // 노트 목록 표시
         function displayNotes(notes) {
             const notesList = document.getElementById('notesList');
-            currentNotes = notes; // 전역 변수에 저장
+            currentNotes = notes;
             
             if (notes.length === 0) {
                 notesList.innerHTML = '<p class="text-gray-500">No notes yet</p>';
@@ -542,17 +620,15 @@ console.log('Hello World');
                         <p class="line-clamp-3 overflow-hidden">${truncateText(note.content, 150)}</p>
                     </div>
                     <div class="flex justify-between items-center">
-                        <p class="text-gray-500 text-sm">${formatDate(note.created_at || note.date)}</p>
+                        <p class="text-gray-500 text-sm">${formatDate(note.created_at)}</p>
                         <p class="text-blue-400 text-sm">Click to read more →</p>
                     </div>
                 </div>
-            `).join('');}
+            `).join('');
         }
 
-        let currentNotes = []; // 전역 변수로 현재 노트 목록 저장
-
+        // 노트 모달 표시
         function showNoteModal(noteId) {
-            // 현재 노트 목록에서 해당 노트 찾기
             const note = currentNotes.find(n => n.id == noteId);
             if (!note) {
                 showStatus('Note not found', 'error');
@@ -561,9 +637,8 @@ console.log('Hello World');
             
             document.getElementById('modalNoteTitle').textContent = note.title;
             document.getElementById('modalNoteAuthor').textContent = 'by ' + note.author;
-            document.getElementById('modalNoteDate').textContent = formatDate(note.created_at || note.date);
+            document.getElementById('modalNoteDate').textContent = formatDate(note.created_at);
             
-            // Render markdown
             const html = marked.parse(note.content);
             document.getElementById('modalNoteContent').innerHTML = html;
             
@@ -574,121 +649,90 @@ console.log('Hello World');
             document.getElementById('noteModal').classList.add('hidden');
         }
 
-        // 로컬 저장소 헬퍼 함수들
-        function saveLocalFile(file) {
-            const files = JSON.parse(localStorage.getItem('archiveFiles') || '[]');
-            const fileData = {
-                id: Date.now(),
-                name: file.name,
-                size: file.size,
-                type: file.type,
-                uploadDate: new Date().toISOString()
-            };
-            files.push(fileData);
-            localStorage.setItem('archiveFiles', JSON.stringify(files));
-        }
-
-        function saveLocalNote(note) {
-            const notes = JSON.parse(localStorage.getItem('archivePosts') || '[]');
-            const noteData = {
-                id: Date.now(),
-                title: note.title,
-                content: note.content,
-                author: note.author,
-                date: new Date().toISOString()
-            };
-            notes.unshift(noteData);
-            localStorage.setItem('archivePosts', JSON.stringify(notes));
-        }
-
-        function loadLocalData() {
-            const files = JSON.parse(localStorage.getItem('archiveFiles') || '[]');
-            const notes = JSON.parse(localStorage.getItem('archivePosts') || '[]');
-            displayFiles(files);
-            displayNotes(notes);
-        }
-
+        // 파일 다운로드
         async function downloadFile(filePath, fileName) {
             try {
                 showStatus(`Preparing download: ${fileName}`, 'info');
-                
-                // 익명 사용자가 없으면 재연결 시도
-                if (!anonymousUser) {
-                    showStatus('Connecting to storage...', 'info');
-                    await initializeArchive();
-                    
-                    // 여전히 연결 안되면 로컬 파일인지 확인
-                    if (!anonymousUser) {
-                        showStatus('File stored locally only, cannot download', 'error');
-                        return;
-                    }
-                }
-                
-                const url = await archiveManager.getDownloadUrl(filePath);
-                
-                // 직접 다운로드 시도 (fetch로 먼저 확인)
-                const response = await fetch(url, { method: 'HEAD' });
-                if (!response.ok) {
-                    throw new Error('File not accessible');
-                }
-                
-                // 다운로드 링크 생성
-                const downloadLink = document.createElement('a');
-                downloadLink.href = url;
-                downloadLink.download = fileName;
-                downloadLink.style.display = 'none';
-                
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
+                const { data, error } = await supabase.storage
+                    .from('archive-files')
+                    .createSignedUrl(filePath, 3600);
+
+                if (error) throw error;
+
+                const a = document.createElement('a');
+                a.href = data.signedUrl;
+                a.download = fileName;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
                 
                 showStatus(`Download started: ${fileName}`, 'success');
             } catch (error) {
-                console.error('Download error:', error);
-                showStatus(`Download failed: ${error.message || 'Unknown error'}`, 'error');
+                showStatus(`Download failed: ${error.message}`, 'error');
             }
         }
 
-        async function deleteFile(filePathOrId) {
+        // 파일 삭제
+        async function deleteFile(filePath) {
             if (confirm('Are you sure you want to delete this file?')) {
                 try {
-                    if (anonymousUser && filePathOrId.includes('/')) {
-                        // Supabase file
-                        await archiveManager.deleteFile(filePathOrId);
-                    } else {
-                        // Local file
-                        let files = JSON.parse(localStorage.getItem('archiveFiles') || '[]');
-                        files = files.filter(f => f.id != filePathOrId);
-                        localStorage.setItem('archiveFiles', JSON.stringify(files));
-                    }
-                    
+                    const { error } = await supabase.storage
+                        .from('archive-files')
+                        .remove([filePath]);
+
+                    if (error) throw error;
+
                     showStatus('File deleted successfully!', 'success');
-                    await loadFiles();
+                    loadFiles();
                 } catch (error) {
                     showStatus(`Error deleting file: ${error.message}`, 'error');
                 }
             }
         }
 
+        // 노트 삭제
         async function deleteNote(id) {
             if (confirm('Are you sure you want to delete this note?')) {
                 try {
-                    if (anonymousUser) {
-                        await archiveManager.deleteNote(id);
-                    } else {
-                        let notes = JSON.parse(localStorage.getItem('archivePosts') || '[]');
-                        notes = notes.filter(n => n.id != id);
-                        localStorage.setItem('archivePosts', JSON.stringify(notes));
-                    }
-                    
+                    const { error } = await supabase
+                        .from('notes')
+                        .delete()
+                        .eq('id', id);
+
+                    if (error) throw error;
+
                     showStatus('Note deleted successfully!', 'success');
-                    await loadNotes();
+                    loadNotes();
                 } catch (error) {
                     showStatus(`Error deleting note: ${error.message}`, 'error');
                 }
             }
         }
 
+        // 마크다운 미리보기 토글
+        function togglePreview() {
+            const textarea = document.getElementById('postContent');
+            const preview = document.getElementById('markdownPreview');
+            const toggleBtn = document.getElementById('previewToggle');
+            
+            if (isPreviewMode) {
+                textarea.classList.remove('hidden');
+                preview.classList.add('hidden');
+                toggleBtn.textContent = 'Preview';
+                isPreviewMode = false;
+            } else {
+                const markdown = textarea.value;
+                const html = marked.parse(markdown);
+                preview.innerHTML = html;
+                textarea.classList.add('hidden');
+                preview.classList.remove('hidden');
+                toggleBtn.textContent = 'Edit';
+                isPreviewMode = true;
+            }
+        }
+
+        // 상태 메시지 표시
         function showStatus(message, type) {
             const statusBar = document.getElementById('statusBar');
             const statusMessage = document.getElementById('statusMessage');
@@ -713,7 +757,7 @@ console.log('Hello World');
             setTimeout(() => statusBar.classList.add('hidden'), 3000);
         }
 
-        // 유틸리티 함수들
+        // 유틸리티 함수
         function formatFileSize(bytes) {
             if (bytes < 1024) return bytes + ' B';
             if (bytes < 1048576) return Math.round(bytes / 1024) + ' KB';
@@ -730,39 +774,13 @@ console.log('Hello World');
             return text.substring(0, length) + '...';
         }
 
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function unescapeHtml(html) {
-            const div = document.createElement('div');
-            div.innerHTML = html;
-            return div.textContent || div.innerText || '';
-        }
-
-        // 모달 외부 클릭시 닫기
+        // 모달 이벤트
         document.getElementById('noteModal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('noteModal')) {
                 closeNoteModal();
             }
         });
 
-        // 로그아웃 기능
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                // 모든 인증 정보 제거
-                sessionStorage.removeItem('archiveAuth');
-                localStorage.removeItem('archiveAuth');
-                localStorage.removeItem('archiveAuthTime');
-                
-                // 페이지 새로고침으로 로그인 화면 복원
-                location.reload();
-            }
-        }
-
-        // ESC 키로 모달 닫기
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeNoteModal();
