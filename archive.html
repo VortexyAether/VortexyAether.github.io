@@ -266,6 +266,7 @@ console.log('Hello World');
             });
 
             setupEventListeners();
+            setupRealTimeSync();
         });
 
         function setupEventListeners() {
@@ -349,12 +350,11 @@ console.log('Hello World');
                     
                     if (error) throw error;
                     
-                    if (data.user && !data.user.email_confirmed_at) {
-                        successDiv.textContent = 'Please check your email to verify your account, then sign in.';
+                    // 가입 즉시 로그인 처리 (이메일 확인 불필요)
+                    if (data.user) {
+                        successDiv.textContent = 'Account created successfully! You are now signed in.';
                         successDiv.classList.remove('hidden');
-                        // 가입 후 로그인 탭으로 전환
-                        isLogin = true;
-                        updateAuthUI();
+                        // 자동으로 로그인 상태가 됨
                     }
                 }
                 
@@ -416,10 +416,10 @@ console.log('Hello World');
                 throw new Error('File size exceeds 50MB limit');
             }
 
-            // 파일 경로
+            // 파일 경로 (공유 폴더)
             const fileExt = file.name.split('.').pop();
             const fileName = `${Date.now()}_${file.name}`;
-            const filePath = `${currentUser.id}/${fileName}`;
+            const filePath = `shared/${fileName}`;
 
             const { data, error } = await supabase.storage
                 .from('archive-files')
@@ -486,8 +486,7 @@ console.log('Hello World');
                     .insert([{
                         title,
                         content,
-                        author,
-                        user_id: currentUser.id
+                        author
                     }])
                     .select();
 
@@ -514,7 +513,7 @@ console.log('Hello World');
             try {
                 const { data, error } = await supabase.storage
                     .from('archive-files')
-                    .list(currentUser.id, {
+                    .list('shared', {
                         limit: 100,
                         offset: 0,
                         sortBy: { column: 'created_at', order: 'desc' }
@@ -527,7 +526,7 @@ console.log('Hello World');
                     name: file.name.replace(/^\d+_/, ''),
                     size: file.metadata?.size || 0,
                     type: file.metadata?.mimetype || '',
-                    path: `${currentUser.id}/${file.name}`,
+                    path: `shared/${file.name}`,
                     uploadDate: file.created_at
                 }));
 
@@ -544,7 +543,6 @@ console.log('Hello World');
                 const { data, error } = await supabase
                     .from('notes')
                     .select('*')
-                    .eq('user_id', currentUser.id)
                     .order('created_at', { ascending: false });
 
                 if (error) throw error;
@@ -772,6 +770,28 @@ console.log('Hello World');
         function truncateText(text, length) {
             if (text.length <= length) return text;
             return text.substring(0, length) + '...';
+        }
+
+        // 실시간 동기화 설정
+        function setupRealTimeSync() {
+            if (!supabase) return;
+
+            // 노트 실시간 동기화
+            supabase
+                .channel('notes-realtime')
+                .on('postgres_changes', {
+                    event: '*',
+                    schema: 'public',
+                    table: 'notes'
+                }, (payload) => {
+                    console.log('Notes update:', payload);
+                    if (currentUser) {
+                        loadNotes();
+                    }
+                })
+                .subscribe();
+
+            console.log('Real-time sync enabled for shared archive');
         }
 
         // 모달 이벤트
