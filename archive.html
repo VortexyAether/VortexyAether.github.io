@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Archive - Jaewon's Portfolio</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
     <style>
@@ -16,45 +17,50 @@
     <div id="header-placeholder"></div>
 
     <main class="container mx-auto px-4 py-8 max-w-6xl">
-        <!-- Password Protection Modal -->
-        <div id="passwordModal" class="fixed inset-0 bg-black bg-opacity-50 modal-bg flex items-center justify-center z-50">
+        <!-- Authentication Modal -->
+        <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 modal-bg flex items-center justify-center z-50">
             <div class="bg-gray-800 p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
-                <h2 class="text-2xl font-bold text-white mb-4">Archive Access</h2>
-                <p class="text-gray-400 mb-6">This section is password protected. Please enter the password to continue.</p>
-                <input type="password" id="passwordInput" 
-                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                    placeholder="Enter password">
-                <div id="passwordError" class="text-red-500 text-sm mt-2 hidden">Incorrect password. Please try again.</div>
-                <button onclick="checkPassword()" 
-                    class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
-                    Submit
-                </button>
+                <h2 class="text-2xl font-bold text-white mb-4">Archive Login</h2>
+                
+                <!-- Login/Signup Toggle -->
+                <div class="flex mb-6">
+                    <button id="loginTab" class="flex-1 py-2 px-4 bg-blue-600 text-white rounded-l-lg">Login</button>
+                    <button id="signupTab" class="flex-1 py-2 px-4 bg-gray-600 text-gray-300 rounded-r-lg">Sign Up</button>
+                </div>
+
+                <!-- Auth Form -->
+                <form id="authForm">
+                    <input type="email" id="authEmail" required
+                        class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white mb-4 focus:outline-none focus:border-blue-500"
+                        placeholder="Email">
+                    <input type="password" id="authPassword" required
+                        class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white mb-4 focus:outline-none focus:border-blue-500"
+                        placeholder="Password">
+                    <div id="authError" class="text-red-500 text-sm mb-4 hidden"></div>
+                    <button type="submit" id="authSubmit"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
+                        Login
+                    </button>
+                </form>
             </div>
         </div>
 
         <!-- Archive Content (Hidden initially) -->
         <div id="archiveContent" class="hidden">
-            <h1 class="text-4xl font-bold text-white mb-8">Archive</h1>
-            
-            <!-- GitHub Token Setup (Optional) -->
-            <div id="tokenSetup" class="bg-yellow-900 bg-opacity-20 border border-yellow-600 rounded-lg p-6 mb-8">
-                <h2 class="text-xl font-semibold text-yellow-400 mb-3">Optional: Enable Cloud Storage</h2>
-                <p class="text-gray-400 mb-4">To save files permanently across devices, you can use GitHub Gist as storage. This requires a GitHub Personal Access Token with 'gist' permission.</p>
-                <div class="flex gap-2">
-                    <input type="password" id="githubToken" 
-                        class="flex-1 px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                        placeholder="GitHub Personal Access Token (optional)">
-                    <button onclick="setupGitHub()" 
-                        class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200">
-                        Setup
+            <!-- User Info -->
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-4xl font-bold text-white">Archive</h1>
+                <div class="flex items-center gap-4">
+                    <span id="userEmail" class="text-gray-400"></span>
+                    <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
+                        Logout
                     </button>
                 </div>
-                <p class="text-gray-500 text-sm mt-2">
-                    <a href="https://github.com/settings/tokens/new?scopes=gist" target="_blank" class="text-blue-400 hover:underline">
-                        Create a token here
-                    </a> (select 'gist' scope)
-                </p>
-                <div id="storageStatus" class="mt-2"></div>
+            </div>
+
+            <!-- Status Bar -->
+            <div id="statusBar" class="bg-blue-900 bg-opacity-20 border border-blue-600 rounded-lg p-4 mb-8 hidden">
+                <p id="statusMessage" class="text-blue-400"></p>
             </div>
 
             <!-- Upload Section -->
@@ -67,7 +73,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                         </svg>
                         <p class="text-gray-400">Click to upload or drag and drop</p>
-                        <p class="text-gray-500 text-sm mt-2">Any file type • Max 1MB for cloud storage</p>
+                        <p class="text-gray-500 text-sm mt-2">Any file type • Max 50MB per file</p>
                     </label>
                 </div>
             </div>
@@ -86,7 +92,7 @@
                 <textarea id="postContent" 
                     class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white h-32 focus:outline-none focus:border-blue-500"
                     placeholder="Write your note here..."></textarea>
-                <button onclick="savePost()" 
+                <button onclick="saveNote()" 
                     class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200">
                     Save Note
                 </button>
@@ -96,7 +102,10 @@
             <div class="bg-gray-800 rounded-lg p-6 mb-8">
                 <h2 class="text-2xl font-semibold text-white mb-4">Uploaded Files</h2>
                 <div id="filesList" class="space-y-2">
-                    <!-- Files will be dynamically added here -->
+                    <div class="text-center py-4">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                        <p class="text-gray-400 mt-2">Loading files...</p>
+                    </div>
                 </div>
             </div>
 
@@ -104,7 +113,10 @@
             <div class="bg-gray-800 rounded-lg p-6">
                 <h2 class="text-2xl font-semibold text-white mb-4">Notes</h2>
                 <div id="notesList" class="space-y-4">
-                    <!-- Notes will be dynamically added here -->
+                    <div class="text-center py-4">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                        <p class="text-gray-400 mt-2">Loading notes...</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -114,221 +126,215 @@
 
     <script src="js/loadComponents.js"></script>
     <script src="js/mobileMenu.js"></script>
-    <script src="js/archive-gist.js"></script>
+    <script src="js/supabase-client.js"></script>
     <script>
-        // Password check
-        const PASSWORD = 'archive2024'; // Change this to your desired password
-        let storage = null;
-        let useGist = false;
-        
-        function checkPassword() {
-            const input = document.getElementById('passwordInput').value;
-            const error = document.getElementById('passwordError');
+        let archiveManager;
+        let isLogin = true;
+
+        // 페이지 로드 시 초기화
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Supabase 초기화 대기
+            await new Promise(resolve => setTimeout(resolve, 100));
             
-            if (input === PASSWORD) {
-                sessionStorage.setItem('archiveAuth', 'true');
-                document.getElementById('passwordModal').style.display = 'none';
-                document.getElementById('archiveContent').classList.remove('hidden');
-                initializeStorage();
-            } else {
-                error.classList.remove('hidden');
-                document.getElementById('passwordInput').value = '';
-            }
-        }
-
-        // Initialize storage
-        function initializeStorage() {
-            storage = new ArchiveGistStorage();
-            const token = localStorage.getItem('githubToken');
-            if (token) {
-                storage.setToken(token);
-                useGist = true;
-                updateStorageStatus('Connected to GitHub Gist', 'green');
-                loadArchiveData();
-            } else {
-                updateStorageStatus('Using local storage (data won\'t persist across devices)', 'yellow');
-                loadLocalData();
-            }
-        }
-
-        // Setup GitHub
-        async function setupGitHub() {
-            const token = document.getElementById('githubToken').value;
-            if (!token) {
-                updateStorageStatus('Please enter a valid token', 'red');
-                return;
-            }
-
-            storage.setToken(token);
+            archiveManager = new SupabaseArchiveManager();
             
-            try {
-                // Test the token by trying to save empty data
-                await storage.saveData([], []);
-                useGist = true;
-                updateStorageStatus('Successfully connected to GitHub Gist!', 'green');
-                document.getElementById('githubToken').value = '';
-                loadArchiveData();
-            } catch (error) {
-                updateStorageStatus('Failed to connect: ' + error.message, 'red');
-                useGist = false;
-            }
-        }
-
-        function updateStorageStatus(message, color) {
-            const status = document.getElementById('storageStatus');
-            const colors = {
-                green: 'text-green-400',
-                yellow: 'text-yellow-400',
-                red: 'text-red-400'
-            };
-            status.className = colors[color] + ' text-sm';
-            status.textContent = message;
-        }
-
-        // Check if already authenticated
-        window.addEventListener('DOMContentLoaded', () => {
-            if (sessionStorage.getItem('archiveAuth') === 'true') {
-                document.getElementById('passwordModal').style.display = 'none';
-                document.getElementById('archiveContent').classList.remove('hidden');
-                initializeStorage();
-            }
-            
-            // Enter key support for password input
-            document.getElementById('passwordInput').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    checkPassword();
+            // 인증 상태 리스너
+            archiveManager.onAuthStateChange((event, session) => {
+                if (session) {
+                    showArchiveContent(session.user);
+                } else {
+                    showAuthModal();
                 }
             });
-        });
 
-        // File upload handling
-        document.getElementById('fileInput').addEventListener('change', (e) => {
-            const files = e.target.files;
-            for (let file of files) {
-                uploadFile(file);
-            }
-        });
-
-        // Drag and drop support
-        const dropZone = document.querySelector('.border-dashed').parentElement;
-        
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('border-blue-500');
-        });
-        
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('border-blue-500');
-        });
-        
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('border-blue-500');
-            
-            const files = e.dataTransfer.files;
-            for (let file of files) {
-                uploadFile(file);
-            }
-        });
-
-        // Archive data management
-        async function uploadFile(file) {
-            if (useGist && file.size > 1024 * 1024) { // 1MB limit for Gist
-                alert('File size exceeds 1MB limit for cloud storage. File will be saved locally only.');
-                saveLocalFile(file);
-                return;
-            }
-
-            if (useGist) {
-                try {
-                    const fileData = await storage.uploadFileToGist(file);
-                    const data = await storage.loadData();
-                    data.files.push(fileData);
-                    await storage.saveData(data.files, data.posts);
-                    displayFiles();
-                } catch (error) {
-                    console.error('Error uploading to Gist:', error);
-                    alert('Failed to upload to cloud. Saving locally instead.');
-                    saveLocalFile(file);
-                }
+            // 현재 사용자 체크
+            const user = await archiveManager.getCurrentUser();
+            if (user) {
+                showArchiveContent(user);
             } else {
-                saveLocalFile(file);
+                showAuthModal();
+            }
+
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Auth tab switching
+            document.getElementById('loginTab').addEventListener('click', () => {
+                isLogin = true;
+                updateAuthUI();
+            });
+
+            document.getElementById('signupTab').addEventListener('click', () => {
+                isLogin = false;
+                updateAuthUI();
+            });
+
+            // Auth form submission
+            document.getElementById('authForm').addEventListener('submit', handleAuth);
+
+            // File upload
+            document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+
+            // Drag and drop
+            setupDragAndDrop();
+        }
+
+        function updateAuthUI() {
+            const loginTab = document.getElementById('loginTab');
+            const signupTab = document.getElementById('signupTab');
+            const submitBtn = document.getElementById('authSubmit');
+
+            if (isLogin) {
+                loginTab.className = 'flex-1 py-2 px-4 bg-blue-600 text-white rounded-l-lg';
+                signupTab.className = 'flex-1 py-2 px-4 bg-gray-600 text-gray-300 rounded-r-lg';
+                submitBtn.textContent = 'Login';
+            } else {
+                loginTab.className = 'flex-1 py-2 px-4 bg-gray-600 text-gray-300 rounded-l-lg';
+                signupTab.className = 'flex-1 py-2 px-4 bg-blue-600 text-white rounded-r-lg';
+                submitBtn.textContent = 'Sign Up';
             }
         }
 
-        function saveLocalFile(file) {
-            const files = JSON.parse(localStorage.getItem('archiveFiles') || '[]');
-            const fileData = {
-                id: Date.now(),
-                name: file.name,
-                size: file.size,
-                type: file.type,
-                uploadDate: new Date().toISOString()
-            };
-            files.push(fileData);
-            localStorage.setItem('archiveFiles', JSON.stringify(files));
-            displayFiles();
+        async function handleAuth(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const errorDiv = document.getElementById('authError');
+
+            try {
+                if (isLogin) {
+                    await archiveManager.signIn(email, password);
+                } else {
+                    await archiveManager.signUp(email, password);
+                    showStatus('Account created! Please check your email for verification.', 'success');
+                }
+                
+                errorDiv.classList.add('hidden');
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.classList.remove('hidden');
+            }
         }
 
-        async function savePost() {
+        function showAuthModal() {
+            document.getElementById('authModal').style.display = 'flex';
+            document.getElementById('archiveContent').classList.add('hidden');
+        }
+
+        function showArchiveContent(user) {
+            document.getElementById('authModal').style.display = 'none';
+            document.getElementById('archiveContent').classList.remove('hidden');
+            document.getElementById('userEmail').textContent = user.email;
+            
+            // 데이터 로드
+            loadFiles();
+            loadNotes();
+        }
+
+        async function logout() {
+            try {
+                await archiveManager.signOut();
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+
+        async function handleFileUpload(e) {
+            const files = e.target.files;
+            
+            for (let file of files) {
+                try {
+                    showStatus(`Uploading ${file.name}...`, 'info');
+                    await archiveManager.uploadFile(file);
+                    showStatus(`${file.name} uploaded successfully!`, 'success');
+                } catch (error) {
+                    showStatus(`Error uploading ${file.name}: ${error.message}`, 'error');
+                }
+            }
+            
+            e.target.value = ''; // Reset input
+            loadFiles(); // Refresh file list
+        }
+
+        function setupDragAndDrop() {
+            const dropZone = document.querySelector('.border-dashed').parentElement;
+            
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('border-blue-500');
+            });
+            
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('border-blue-500');
+            });
+            
+            dropZone.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('border-blue-500');
+                
+                const files = e.dataTransfer.files;
+                for (let file of files) {
+                    try {
+                        showStatus(`Uploading ${file.name}...`, 'info');
+                        await archiveManager.uploadFile(file);
+                        showStatus(`${file.name} uploaded successfully!`, 'success');
+                    } catch (error) {
+                        showStatus(`Error uploading ${file.name}: ${error.message}`, 'error');
+                    }
+                }
+                
+                loadFiles(); // Refresh file list
+            });
+        }
+
+        async function saveNote() {
             const author = document.getElementById('postAuthor').value || 'Anonymous';
             const title = document.getElementById('postTitle').value;
             const content = document.getElementById('postContent').value;
-            
+
             if (!title || !content) {
-                alert('Please fill in both title and content');
+                showStatus('Please fill in both title and content', 'error');
                 return;
             }
-            
-            const post = {
-                id: Date.now(),
-                author: author,
-                title: title,
-                content: content,
-                date: new Date().toISOString()
-            };
 
-            if (useGist) {
-                try {
-                    const data = await storage.loadData();
-                    data.posts.unshift(post);
-                    await storage.saveData(data.files, data.posts);
-                } catch (error) {
-                    console.error('Error saving to Gist:', error);
-                    alert('Failed to save to cloud. Saving locally instead.');
-                    saveLocalPost(post);
-                }
-            } else {
-                saveLocalPost(post);
+            try {
+                await archiveManager.createNote(title, content, author);
+                
+                // Clear form
+                document.getElementById('postAuthor').value = '';
+                document.getElementById('postTitle').value = '';
+                document.getElementById('postContent').value = '';
+                
+                showStatus('Note saved successfully!', 'success');
+                loadNotes(); // Refresh notes list
+            } catch (error) {
+                showStatus(`Error saving note: ${error.message}`, 'error');
             }
-            
-            document.getElementById('postAuthor').value = '';
-            document.getElementById('postTitle').value = '';
-            document.getElementById('postContent').value = '';
-            displayPosts();
         }
 
-        function saveLocalPost(post) {
-            const posts = JSON.parse(localStorage.getItem('archivePosts') || '[]');
-            posts.unshift(post);
-            localStorage.setItem('archivePosts', JSON.stringify(posts));
+        async function loadFiles() {
+            try {
+                const files = await archiveManager.getFiles();
+                displayFiles(files);
+            } catch (error) {
+                document.getElementById('filesList').innerHTML = 
+                    `<p class="text-red-400">Error loading files: ${error.message}</p>`;
+            }
         }
 
-        async function displayFiles() {
-            let files = [];
-            
-            if (useGist) {
-                try {
-                    const data = await storage.loadData();
-                    files = data.files;
-                } catch (error) {
-                    console.error('Error loading from Gist:', error);
-                    files = JSON.parse(localStorage.getItem('archiveFiles') || '[]');
-                }
-            } else {
-                files = JSON.parse(localStorage.getItem('archiveFiles') || '[]');
+        async function loadNotes() {
+            try {
+                const notes = await archiveManager.getNotes();
+                displayNotes(notes);
+            } catch (error) {
+                document.getElementById('notesList').innerHTML = 
+                    `<p class="text-red-400">Error loading notes: ${error.message}</p>`;
             }
-            
+        }
+
+        function displayFiles(files) {
             const filesList = document.getElementById('filesList');
             
             if (files.length === 0) {
@@ -348,12 +354,12 @@
                         </div>
                     </div>
                     <div class="flex gap-2">
-                        ${file.data ? `<button onclick="downloadGistFile(${file.id})" class="text-blue-400 hover:text-blue-300">
+                        <button onclick="downloadFile('${file.path}', '${file.name}')" class="text-blue-400 hover:text-blue-300">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                             </svg>
-                        </button>` : ''}
-                        <button onclick="deleteFile(${file.id})" class="text-red-400 hover:text-red-300">
+                        </button>
+                        <button onclick="deleteFile('${file.path}')" class="text-red-400 hover:text-red-300">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                             </svg>
@@ -363,122 +369,98 @@
             `).join('');
         }
 
-        async function displayPosts() {
-            let posts = [];
-            
-            if (useGist) {
-                try {
-                    const data = await storage.loadData();
-                    posts = data.posts;
-                } catch (error) {
-                    console.error('Error loading from Gist:', error);
-                    posts = JSON.parse(localStorage.getItem('archivePosts') || '[]');
-                }
-            } else {
-                posts = JSON.parse(localStorage.getItem('archivePosts') || '[]');
-            }
-            
+        function displayNotes(notes) {
             const notesList = document.getElementById('notesList');
             
-            if (posts.length === 0) {
+            if (notes.length === 0) {
                 notesList.innerHTML = '<p class="text-gray-500">No notes yet</p>';
                 return;
             }
             
-            notesList.innerHTML = posts.map(post => `
+            notesList.innerHTML = notes.map(note => `
                 <div class="bg-gray-700 rounded-lg p-4">
                     <div class="flex justify-between items-start mb-2">
                         <div>
-                            <h3 class="text-white font-semibold text-lg">${post.title}</h3>
-                            <p class="text-blue-400 text-sm">by ${post.author || 'Anonymous'}</p>
+                            <h3 class="text-white font-semibold text-lg">${note.title}</h3>
+                            <p class="text-blue-400 text-sm">by ${note.author}</p>
                         </div>
-                        <button onclick="deletePost(${post.id})" class="text-red-400 hover:text-red-300">
+                        <button onclick="deleteNote('${note.id}')" class="text-red-400 hover:text-red-300">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
                         </button>
                     </div>
-                    <p class="text-gray-300 mb-2">${post.content}</p>
-                    <p class="text-gray-500 text-sm">${formatDate(post.date)}</p>
+                    <p class="text-gray-300 mb-2">${note.content}</p>
+                    <p class="text-gray-500 text-sm">${formatDate(note.created_at)}</p>
                 </div>
             `).join('');
         }
 
-        async function downloadGistFile(id) {
-            if (!useGist) return;
-            
-            const data = await storage.loadData();
-            const file = data.files.find(f => f.id === id);
-            if (file && file.data) {
-                storage.downloadFile(file);
+        async function downloadFile(filePath, fileName) {
+            try {
+                const url = await archiveManager.getDownloadUrl(filePath);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } catch (error) {
+                showStatus(`Error downloading file: ${error.message}`, 'error');
             }
         }
 
-        async function deleteFile(id) {
+        async function deleteFile(filePath) {
             if (confirm('Are you sure you want to delete this file?')) {
-                if (useGist) {
-                    try {
-                        const data = await storage.loadData();
-                        data.files = data.files.filter(f => f.id !== id);
-                        await storage.saveData(data.files, data.posts);
-                    } catch (error) {
-                        console.error('Error deleting from Gist:', error);
-                        deleteLocalFile(id);
-                    }
-                } else {
-                    deleteLocalFile(id);
-                }
-                displayFiles();
-            }
-        }
-
-        function deleteLocalFile(id) {
-            let files = JSON.parse(localStorage.getItem('archiveFiles') || '[]');
-            files = files.filter(f => f.id !== id);
-            localStorage.setItem('archiveFiles', JSON.stringify(files));
-        }
-
-        async function deletePost(id) {
-            if (confirm('Are you sure you want to delete this note?')) {
-                if (useGist) {
-                    try {
-                        const data = await storage.loadData();
-                        data.posts = data.posts.filter(p => p.id !== id);
-                        await storage.saveData(data.files, data.posts);
-                    } catch (error) {
-                        console.error('Error deleting from Gist:', error);
-                        deleteLocalPost(id);
-                    }
-                } else {
-                    deleteLocalPost(id);
-                }
-                displayPosts();
-            }
-        }
-
-        function deleteLocalPost(id) {
-            let posts = JSON.parse(localStorage.getItem('archivePosts') || '[]');
-            posts = posts.filter(p => p.id !== id);
-            localStorage.setItem('archivePosts', JSON.stringify(posts));
-        }
-
-        async function loadArchiveData() {
-            if (useGist) {
                 try {
-                    await displayFiles();
-                    await displayPosts();
+                    await archiveManager.deleteFile(filePath);
+                    showStatus('File deleted successfully!', 'success');
+                    loadFiles(); // Refresh file list
                 } catch (error) {
-                    console.error('Error loading from Gist:', error);
-                    loadLocalData();
+                    showStatus(`Error deleting file: ${error.message}`, 'error');
                 }
-            } else {
-                loadLocalData();
             }
         }
 
-        function loadLocalData() {
-            displayFiles();
-            displayPosts();
+        async function deleteNote(id) {
+            if (confirm('Are you sure you want to delete this note?')) {
+                try {
+                    await archiveManager.deleteNote(id);
+                    showStatus('Note deleted successfully!', 'success');
+                    loadNotes(); // Refresh notes list
+                } catch (error) {
+                    showStatus(`Error deleting note: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        function showStatus(message, type) {
+            const statusBar = document.getElementById('statusBar');
+            const statusMessage = document.getElementById('statusMessage');
+            
+            statusMessage.textContent = message;
+            
+            // Color based on type
+            statusBar.className = `border rounded-lg p-4 mb-8`;
+            switch (type) {
+                case 'success':
+                    statusBar.className += ' bg-green-900 bg-opacity-20 border-green-600 text-green-400';
+                    break;
+                case 'error':
+                    statusBar.className += ' bg-red-900 bg-opacity-20 border-red-600 text-red-400';
+                    break;
+                case 'info':
+                default:
+                    statusBar.className += ' bg-blue-900 bg-opacity-20 border-blue-600 text-blue-400';
+                    break;
+            }
+            
+            statusBar.classList.remove('hidden');
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                statusBar.classList.add('hidden');
+            }, 3000);
         }
 
         function formatFileSize(bytes) {
