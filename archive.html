@@ -75,9 +75,14 @@
             <!-- Write Post Section -->
             <div class="bg-gray-800 rounded-lg p-6 mb-8">
                 <h2 class="text-2xl font-semibold text-white mb-4">Write a Note</h2>
-                <input type="text" id="postTitle" 
-                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white mb-4 focus:outline-none focus:border-blue-500"
-                    placeholder="Title">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <input type="text" id="postAuthor" 
+                        class="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                        placeholder="Your name">
+                    <input type="text" id="postTitle" 
+                        class="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                        placeholder="Title">
+                </div>
                 <textarea id="postContent" 
                     class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white h-32 focus:outline-none focus:border-blue-500"
                     placeholder="Write your note here..."></textarea>
@@ -266,6 +271,7 @@
         }
 
         async function savePost() {
+            const author = document.getElementById('postAuthor').value || 'Anonymous';
             const title = document.getElementById('postTitle').value;
             const content = document.getElementById('postContent').value;
             
@@ -276,6 +282,7 @@
             
             const post = {
                 id: Date.now(),
+                author: author,
                 title: title,
                 content: content,
                 date: new Date().toISOString()
@@ -295,6 +302,7 @@
                 saveLocalPost(post);
             }
             
+            document.getElementById('postAuthor').value = '';
             document.getElementById('postTitle').value = '';
             document.getElementById('postContent').value = '';
             displayPosts();
@@ -380,7 +388,10 @@
             notesList.innerHTML = posts.map(post => `
                 <div class="bg-gray-700 rounded-lg p-4">
                     <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-white font-semibold text-lg">${post.title}</h3>
+                        <div>
+                            <h3 class="text-white font-semibold text-lg">${post.title}</h3>
+                            <p class="text-blue-400 text-sm">by ${post.author || 'Anonymous'}</p>
+                        </div>
                         <button onclick="deletePost(${post.id})" class="text-red-400 hover:text-red-300">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
