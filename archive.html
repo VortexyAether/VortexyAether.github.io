@@ -207,12 +207,28 @@ console.log('Hello World');
 
     <script src="js/loadComponents.js"></script>
     <script src="js/mobileMenu.js"></script>
-    <script src="js/supabase-client.js"></script>
     <script>
         // Archive 관리 변수들
-        let archiveManager;
+        let archiveManager = null;
         let anonymousUser = null;
         let isPreviewMode = false;
+        let supabaseClient = null;
+        
+        // Supabase 클라이언트 초기화
+        const SUPABASE_URL = 'https://kbciqteoeanrssxclwtt.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtiY2lxdGVvZWFucnNzeGNsd3R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwNzc1MDMsImV4cCI6MjA3MDY1MzUwM30.URgrlom7TXpdpI7bpzOhgUl-4s02Pq-FVPpL28NaB6U';
+        
+        // Supabase 초기화 시도
+        try {
+            if (typeof window.supabase !== 'undefined') {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase client initialized successfully');
+            } else {
+                console.warn('Supabase library not loaded, using local storage only');
+            }
+        } catch (error) {
+            console.warn('Supabase initialization failed:', error);
+        }
 
         // 페이지 로드 시 초기화
         window.addEventListener('DOMContentLoaded', async () => {
@@ -255,111 +271,59 @@ console.log('Hello World');
             const input = document.getElementById('passwordInput').value;
             const error = document.getElementById('passwordError');
             
+            console.log('Checking password...', input); // 디버그
+            
             if (!input.trim()) {
                 error.textContent = 'Please enter a password';
                 error.classList.remove('hidden');
                 return;
             }
             
-            try {
-                // 기본 비밀번호로 먼저 체크 (폴백)
-                if (input === 'archive2024') {
-                    sessionStorage.setItem('archiveAuth', 'true');
-                    localStorage.setItem('archiveAuth', 'true');
-                    localStorage.setItem('archiveAuthTime', Date.now().toString());
-                    
-                    document.getElementById('passwordModal').style.display = 'none';
-                    document.getElementById('archiveContent').classList.remove('hidden');
+            // 간단한 비밀번호 체크
+            if (input === 'archive2024') {
+                console.log('Password correct, logging in...');
+                
+                // 인증 정보 저장
+                sessionStorage.setItem('archiveAuth', 'true');
+                localStorage.setItem('archiveAuth', 'true');
+                localStorage.setItem('archiveAuthTime', Date.now().toString());
+                
+                // UI 업데이트
+                document.getElementById('passwordModal').style.display = 'none';
+                document.getElementById('archiveContent').classList.remove('hidden');
+                error.classList.add('hidden');
+                
+                // Archive 초기화
+                try {
                     await initializeArchive();
-                    error.classList.add('hidden');
-                    return;
+                    console.log('Archive initialized successfully');
+                } catch (initError) {
+                    console.error('Archive initialization failed:', initError);
+                    // 초기화 실패해도 UI는 표시
                 }
                 
-                // Supabase 초기화 시도
-                if (!archiveManager) {
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    archiveManager = new SupabaseArchiveManager();
-                }
-                
-                // Supabase 함수로 비밀번호 검증 시도
-                const { data, error: rpcError } = await supabase
-                    .rpc('verify_archive_password', { input_password: input });
-                
-                if (rpcError) {
-                    console.warn('Supabase RPC failed, using fallback:', rpcError);
-                    // Supabase 실패시 기본 비밀번호로 폴백
-                    throw new Error('Supabase connection failed');
-                }
-                
-                if (data === true) {
-                    sessionStorage.setItem('archiveAuth', 'true');
-                    localStorage.setItem('archiveAuth', 'true');
-                    localStorage.setItem('archiveAuthTime', Date.now().toString());
-                    
-                    document.getElementById('passwordModal').style.display = 'none';
-                    document.getElementById('archiveContent').classList.remove('hidden');
-                    await initializeArchive();
-                    error.classList.add('hidden');
-                } else {
-                    error.textContent = 'Incorrect password. Please try again.';
-                    error.classList.remove('hidden');
-                    document.getElementById('passwordInput').value = '';
-                }
-            } catch (err) {
-                console.warn('Password verification failed, using fallback:', err);
-                // 모든 것이 실패하면 하드코딩된 비밀번호로 체크
-                if (input === 'archive2024') {
-                    sessionStorage.setItem('archiveAuth', 'true');
-                    localStorage.setItem('archiveAuth', 'true');
-                    localStorage.setItem('archiveAuthTime', Date.now().toString());
-                    
-                    document.getElementById('passwordModal').style.display = 'none';
-                    document.getElementById('archiveContent').classList.remove('hidden');
-                    await initializeArchive();
-                    error.classList.add('hidden');
-                } else {
-                    error.textContent = 'Incorrect password. Please try again.';
-                    error.classList.remove('hidden');
-                    document.getElementById('passwordInput').value = '';
-                }
+                return;
             }
+            
+            // 비밀번호 틀림
+            console.log('Incorrect password');
+            error.textContent = 'Incorrect password. Please try again.';
+            error.classList.remove('hidden');
+            document.getElementById('passwordInput').value = '';
         }
 
         async function initializeArchive() {
-            // archiveManager가 이미 초기화되어 있음
+            console.log('Initializing archive...');
             
-            // 익명 사용자로 로그인 (항상 같은 익명 사용자 사용)
+            // 일단 로컬 데이터로 시작
             try {
-                // 고정된 익명 사용자 계정으로 로그인
-                const anonymousEmail = 'anonymous@archive.local';
-                const anonymousPassword = 'archive_anonymous_2024';
-                
-                try {
-                    const result = await archiveManager.signIn(anonymousEmail, anonymousPassword);
-                    anonymousUser = result.user;
-                    console.log('익명 사용자 로그인 성공:', anonymousUser?.id);
-                } catch (error) {
-                    console.log('익명 계정 생성 시도:', error.message);
-                    // 계정이 없으면 생성
-                    try {
-                        await archiveManager.signUp(anonymousEmail, anonymousPassword);
-                        const result = await archiveManager.signIn(anonymousEmail, anonymousPassword);
-                        anonymousUser = result.user;
-                        console.log('익명 사용자 생성 후 로그인:', anonymousUser?.id);
-                    } catch (signupError) {
-                        console.log('Using local storage fallback:', signupError.message);
-                        anonymousUser = null;
-                    }
-                }
-                
-                // 데이터 로드
-                await loadFiles();
-                await loadNotes();
-                
-            } catch (error) {
-                console.log('Using local storage fallback:', error);
-                anonymousUser = null;
                 loadLocalData();
+                console.log('Local data loaded successfully');
+            } catch (error) {
+                console.error('Failed to load local data:', error);
+                // 빈 상태로라도 표시
+                displayFiles([]);
+                displayNotes([]);
             }
         }
 
