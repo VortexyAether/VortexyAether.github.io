@@ -116,6 +116,28 @@
                 <p id="statusMessage" class="text-blue-400"></p>
             </div>
 
+            <!-- Files List -->
+            <div class="bg-gray-800 rounded-lg p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-white mb-4">Uploaded Files</h2>
+                <div id="filesList" class="space-y-2">
+                    <div class="text-center py-4">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                        <p class="text-gray-400 mt-2">Loading files...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes List -->
+            <div class="bg-gray-800 rounded-lg p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-white mb-4">Notes</h2>
+                <div id="notesList" class="space-y-4">
+                    <div class="text-center py-4">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                        <p class="text-gray-400 mt-2">Loading notes...</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Upload Section -->
             <div class="bg-gray-800 rounded-lg p-6 mb-8">
                 <h2 class="text-2xl font-semibold text-white mb-4">Upload Files</h2>
@@ -152,7 +174,7 @@
                     </div>
                     <div class="relative">
                         <textarea id="postContent" 
-                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white h-48 focus:outline-none focus:border-blue-500 font-mono"
+                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white h-80 focus:outline-none focus:border-blue-500 font-mono"
                             placeholder="Write your note here... (Markdown supported)
 
 Examples:
@@ -169,7 +191,7 @@ Examples:
 console.log('Hello World');
 ```
 "></textarea>
-                        <div id="markdownPreview" class="hidden w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg h-48 overflow-y-auto markdown-content">
+                        <div id="markdownPreview" class="hidden w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg h-80 overflow-y-auto markdown-content">
                         </div>
                     </div>
                 </div>
@@ -177,28 +199,6 @@ console.log('Hello World');
                     class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-200">
                     Save Note
                 </button>
-            </div>
-
-            <!-- Files List -->
-            <div class="bg-gray-800 rounded-lg p-6 mb-8">
-                <h2 class="text-2xl font-semibold text-white mb-4">Uploaded Files</h2>
-                <div id="filesList" class="space-y-2">
-                    <div class="text-center py-4">
-                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-                        <p class="text-gray-400 mt-2">Loading files...</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Notes List -->
-            <div class="bg-gray-800 rounded-lg p-6">
-                <h2 class="text-2xl font-semibold text-white mb-4">Notes</h2>
-                <div id="notesList" class="space-y-4">
-                    <div class="text-center py-4">
-                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-                        <p class="text-gray-400 mt-2">Loading notes...</p>
-                    </div>
-                </div>
             </div>
         </div>
     </main>
@@ -528,6 +528,7 @@ console.log('Hello World');
 
         function displayNotes(notes) {
             const notesList = document.getElementById('notesList');
+            currentNotes = notes; // 전역 변수에 저장
             
             if (notes.length === 0) {
                 notesList.innerHTML = '<p class="text-gray-500">No notes yet</p>';
@@ -536,7 +537,7 @@ console.log('Hello World');
             
             notesList.innerHTML = notes.map(note => `
                 <div class="bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition-colors cursor-pointer" 
-                     onclick="showNoteModal('${note.id}', '${escapeHtml(note.title)}', '${escapeHtml(note.author)}', '${note.created_at || note.date}', '${escapeHtml(note.content)}')">
+                     onclick="showNoteModal('${note.id}')">
                     <div class="flex justify-between items-start mb-2">
                         <div class="flex-1">
                             <h3 class="text-white font-semibold text-lg">${note.title}</h3>
@@ -556,16 +557,25 @@ console.log('Hello World');
                         <p class="text-blue-400 text-sm">Click to read more →</p>
                     </div>
                 </div>
-            `).join('');
+            `).join('');}
         }
 
-        function showNoteModal(id, title, author, date, content) {
-            document.getElementById('modalNoteTitle').textContent = unescapeHtml(title);
-            document.getElementById('modalNoteAuthor').textContent = 'by ' + unescapeHtml(author);
-            document.getElementById('modalNoteDate').textContent = formatDate(date);
+        let currentNotes = []; // 전역 변수로 현재 노트 목록 저장
+
+        function showNoteModal(noteId) {
+            // 현재 노트 목록에서 해당 노트 찾기
+            const note = currentNotes.find(n => n.id == noteId);
+            if (!note) {
+                showStatus('Note not found', 'error');
+                return;
+            }
+            
+            document.getElementById('modalNoteTitle').textContent = note.title;
+            document.getElementById('modalNoteAuthor').textContent = 'by ' + note.author;
+            document.getElementById('modalNoteDate').textContent = formatDate(note.created_at || note.date);
             
             // Render markdown
-            const html = marked.parse(unescapeHtml(content));
+            const html = marked.parse(note.content);
             document.getElementById('modalNoteContent').innerHTML = html;
             
             document.getElementById('noteModal').classList.remove('hidden');
@@ -610,20 +620,33 @@ console.log('Hello World');
         }
 
         async function downloadFile(filePath, fileName) {
-            if (!anonymousUser) {
-                showStatus('Please wait, connecting to storage...', 'info');
-                return;
-            }
-            
             try {
                 showStatus(`Preparing download: ${fileName}`, 'info');
+                
+                // 익명 사용자가 없으면 재연결 시도
+                if (!anonymousUser) {
+                    showStatus('Connecting to storage...', 'info');
+                    await initializeArchive();
+                    
+                    // 여전히 연결 안되면 로컬 파일인지 확인
+                    if (!anonymousUser) {
+                        showStatus('File stored locally only, cannot download', 'error');
+                        return;
+                    }
+                }
+                
                 const url = await archiveManager.getDownloadUrl(filePath);
                 
-                // 새 창에서 다운로드 (더 안정적)
+                // 직접 다운로드 시도 (fetch로 먼저 확인)
+                const response = await fetch(url, { method: 'HEAD' });
+                if (!response.ok) {
+                    throw new Error('File not accessible');
+                }
+                
+                // 다운로드 링크 생성
                 const downloadLink = document.createElement('a');
                 downloadLink.href = url;
                 downloadLink.download = fileName;
-                downloadLink.target = '_blank';
                 downloadLink.style.display = 'none';
                 
                 document.body.appendChild(downloadLink);
@@ -633,7 +656,7 @@ console.log('Hello World');
                 showStatus(`Download started: ${fileName}`, 'success');
             } catch (error) {
                 console.error('Download error:', error);
-                showStatus(`Download failed: ${error.message}`, 'error');
+                showStatus(`Download failed: ${error.message || 'Unknown error'}`, 'error');
             }
         }
 
