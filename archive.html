@@ -204,8 +204,7 @@ console.log('Hello World');
     <script src="js/mobileMenu.js"></script>
     <script src="js/supabase-client.js"></script>
     <script>
-        // 간단한 비밀번호
-        const PASSWORD = 'archive2024';
+        // Archive 관리 변수들
         let archiveManager;
         let anonymousUser = null;
         let isPreviewMode = false;
@@ -238,12 +237,42 @@ console.log('Hello World');
             const input = document.getElementById('passwordInput').value;
             const error = document.getElementById('passwordError');
             
-            if (input === PASSWORD) {
-                sessionStorage.setItem('archiveAuth', 'true');
-                document.getElementById('passwordModal').style.display = 'none';
-                document.getElementById('archiveContent').classList.remove('hidden');
-                await initializeArchive();
-            } else {
+            if (!input.trim()) {
+                error.textContent = 'Please enter a password';
+                error.classList.remove('hidden');
+                return;
+            }
+            
+            try {
+                // Supabase 초기화 (아직 안된 경우)
+                if (!archiveManager) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    archiveManager = new SupabaseArchiveManager();
+                }
+                
+                // Supabase 함수로 비밀번호 검증
+                const { data, error: rpcError } = await supabase
+                    .rpc('verify_archive_password', { input_password: input });
+                
+                if (rpcError) {
+                    console.error('RPC Error:', rpcError);
+                    throw new Error('Server error');
+                }
+                
+                if (data === true) {
+                    sessionStorage.setItem('archiveAuth', 'true');
+                    document.getElementById('passwordModal').style.display = 'none';
+                    document.getElementById('archiveContent').classList.remove('hidden');
+                    await initializeArchive();
+                    error.classList.add('hidden');
+                } else {
+                    error.textContent = 'Incorrect password. Please try again.';
+                    error.classList.remove('hidden');
+                    document.getElementById('passwordInput').value = '';
+                }
+            } catch (err) {
+                console.error('Password check error:', err);
+                error.textContent = 'Connection error. Please try again.';
                 error.classList.remove('hidden');
                 document.getElementById('passwordInput').value = '';
             }
