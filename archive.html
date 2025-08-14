@@ -63,9 +63,8 @@
             border-collapse: collapse;
             width: 100%;
             margin: 1rem 0;
-            overflow-x: auto;
-            display: block;
-            white-space: nowrap;
+            display: table;
+            table-layout: fixed;
         }
         .markdown-content table thead {
             background-color: #374151;
@@ -73,9 +72,11 @@
         .markdown-content table th,
         .markdown-content table td {
             border: 1px solid #4b5563;
-            padding: 0.5rem;
+            padding: 0.75rem;
             text-align: left;
             white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         .markdown-content table th {
             font-weight: 600;
@@ -135,7 +136,7 @@
 
         <!-- Note Detail Modal -->
         <div id="noteModal" class="fixed inset-0 bg-black bg-opacity-50 modal-bg flex items-center justify-center z-50 hidden">
-            <div class="bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
+            <div class="bg-gray-800 rounded-lg shadow-xl max-w-7xl w-full mx-4 max-h-[95vh] min-w-[900px] flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center p-6 border-b border-gray-700">
                     <div>
                         <h2 id="modalNoteTitle" class="text-2xl font-bold text-white"></h2>
@@ -155,56 +156,58 @@
                         </button>
                     </div>
                 </div>
-                <div class="p-6 overflow-y-auto max-h-[calc(90vh-300px)]">
-                    <!-- Note Content View -->
-                    <div id="modalNoteContentView">
-                        <div id="modalNoteContent" class="markdown-content text-gray-300"></div>
-                    </div>
-                    
-                    <!-- Note Edit Form -->
-                    <div id="modalNoteEditForm" class="hidden">
-                        <div class="mb-4">
-                            <label class="block text-sm text-gray-400 mb-2">Title</label>
-                            <input type="text" id="editNoteTitle" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                <div class="flex-1 overflow-auto">
+                    <div class="p-6">
+                        <!-- Note Content View -->
+                        <div id="modalNoteContentView">
+                            <div id="modalNoteContent" class="markdown-content text-gray-300"></div>
                         </div>
-                        <div class="mb-4">
-                            <div class="flex justify-between items-center mb-2">
-                                <label class="block text-sm text-gray-400">Content</label>
-                                <button onclick="openTableEditorForEdit()" 
-                                    class="text-green-400 hover:text-green-300 text-sm flex items-center gap-1">
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18M8 4v16m8-16v16"></path>
-                                    </svg>
-                                    Table
-                                </button>
+                        
+                        <!-- Note Edit Form -->
+                        <div id="modalNoteEditForm" class="hidden">
+                            <div class="mb-4">
+                                <label class="block text-sm text-gray-400 mb-2">Title</label>
+                                <input type="text" id="editNoteTitle" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500">
                             </div>
-                            <textarea id="editNoteContent" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white h-40 focus:outline-none focus:border-blue-500 font-mono"></textarea>
-                        </div>
-                        <div class="flex justify-end gap-2">
-                            <button onclick="cancelEditNote()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Cancel</button>
-                            <button onclick="saveEditedNote()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save Changes</button>
+                            <div class="mb-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <label class="block text-sm text-gray-400">Content</label>
+                                    <button onclick="openTableEditorForEdit()" 
+                                        class="text-green-400 hover:text-green-300 text-sm flex items-center gap-1">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18M8 4v16m8-16v16"></path>
+                                        </svg>
+                                        Table
+                                    </button>
+                                </div>
+                                <textarea id="editNoteContent" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white h-40 focus:outline-none focus:border-blue-500 font-mono"></textarea>
+                            </div>
+                            <div class="flex justify-end gap-2">
+                                <button onclick="cancelEditNote()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Cancel</button>
+                                <button onclick="saveEditedNote()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save Changes</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Comments Section -->
-                <div class="border-t border-gray-700 p-6">
-                    <h3 class="text-lg font-semibold text-white mb-4">Comments</h3>
                     
-                    <!-- Comments List -->
-                    <div id="commentsList" class="space-y-3 mb-4">
-                        <div class="text-center py-2">
-                            <p class="text-gray-400 text-sm">Loading comments...</p>
+                    <!-- Comments Section -->
+                    <div class="border-t border-gray-700 p-6">
+                        <h3 class="text-lg font-semibold text-white mb-4">Comments</h3>
+                        
+                        <!-- Comments List -->
+                        <div id="commentsList" class="space-y-3 mb-4">
+                            <div class="text-center py-2">
+                                <p class="text-gray-400 text-sm">Loading comments...</p>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <!-- Add Comment Form -->
-                    <div class="bg-gray-700 rounded-lg p-4">
-                        <h4 class="text-white mb-2">Add a comment</h4>
-                        <textarea id="newCommentContent" placeholder="Write your comment here..." 
-                            class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-lg text-white text-sm h-20 focus:outline-none focus:border-blue-500 resize-none"></textarea>
-                        <div class="flex justify-end mt-2">
-                            <button onclick="addComment()" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">Post Comment</button>
+                        
+                        <!-- Add Comment Form -->
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-white mb-2">Add a comment</h4>
+                            <textarea id="newCommentContent" placeholder="Write your comment here..." 
+                                class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-lg text-white text-sm h-20 focus:outline-none focus:border-blue-500 resize-none"></textarea>
+                            <div class="flex justify-end mt-2">
+                                <button onclick="addComment()" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">Post Comment</button>
+                            </div>
                         </div>
                     </div>
                 </div>
