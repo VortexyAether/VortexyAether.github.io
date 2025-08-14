@@ -59,6 +59,38 @@
         .markdown-content a:hover {
             color: #93c5fd;
         }
+        .markdown-content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1rem 0;
+            overflow-x: auto;
+            display: block;
+            white-space: nowrap;
+        }
+        .markdown-content table thead {
+            background-color: #374151;
+        }
+        .markdown-content table th,
+        .markdown-content table td {
+            border: 1px solid #4b5563;
+            padding: 0.5rem;
+            text-align: left;
+            white-space: normal;
+        }
+        .markdown-content table th {
+            font-weight: 600;
+            color: #ffffff;
+        }
+        .table-container {
+            overflow-x: auto;
+            max-width: 100%;
+            border: 1px solid #4b5563;
+            border-radius: 0.5rem;
+        }
+        .table-editor-popup {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-300">
@@ -136,7 +168,16 @@
                             <input type="text" id="editNoteTitle" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-blue-500">
                         </div>
                         <div class="mb-4">
-                            <label class="block text-sm text-gray-400 mb-2">Content</label>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="block text-sm text-gray-400">Content</label>
+                                <button onclick="openTableEditorForEdit()" 
+                                    class="text-green-400 hover:text-green-300 text-sm flex items-center gap-1">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18M8 4v16m8-16v16"></path>
+                                    </svg>
+                                    Table
+                                </button>
+                            </div>
                             <textarea id="editNoteContent" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white h-40 focus:outline-none focus:border-blue-500 font-mono"></textarea>
                         </div>
                         <div class="flex justify-end gap-2">
@@ -165,6 +206,87 @@
                         <div class="flex justify-end mt-2">
                             <button onclick="addComment()" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700">Post Comment</button>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Editor Modal -->
+        <div id="tableEditorModal" class="fixed inset-0 bg-black bg-opacity-50 modal-bg flex items-center justify-center z-50 hidden">
+            <div class="bg-gray-800 rounded-lg shadow-xl max-w-5xl w-full mx-4 table-editor-popup">
+                <div class="flex justify-between items-center p-6 border-b border-gray-700">
+                    <h2 class="text-xl font-bold text-white">Table Editor</h2>
+                    <button onclick="closeTableEditor()" class="text-gray-400 hover:text-white">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-6">
+                    <!-- Table Size Selector -->
+                    <div class="mb-6">
+                        <h3 class="text-white mb-3">Create New Table</h3>
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="flex items-center gap-2">
+                                <label class="text-gray-400 text-sm">Rows:</label>
+                                <input type="number" id="tableRows" value="3" min="1" max="20" 
+                                    class="w-16 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-gray-400 text-sm">Columns:</label>
+                                <input type="number" id="tableCols" value="3" min="1" max="10" 
+                                    class="w-16 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm">
+                            </div>
+                            <button onclick="generateTable()" class="px-4 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                                Generate
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Table Editor -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-white">Edit Table</h3>
+                            <div class="flex gap-2">
+                                <button onclick="addTableRow()" class="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700">
+                                    + Row
+                                </button>
+                                <button onclick="addTableColumn()" class="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700">
+                                    + Column
+                                </button>
+                                <button onclick="removeTableRow()" class="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700">
+                                    - Row
+                                </button>
+                                <button onclick="removeTableColumn()" class="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700">
+                                    - Column
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-container bg-gray-900 rounded-lg p-4">
+                            <div id="tableEditor" class="overflow-x-auto">
+                                <!-- Dynamic table will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table Preview -->
+                    <div class="mb-6">
+                        <h3 class="text-white mb-3">Markdown Preview</h3>
+                        <div class="bg-gray-900 rounded-lg p-4">
+                            <textarea id="tableMarkdown" readonly 
+                                class="w-full h-32 bg-gray-800 border border-gray-600 rounded text-white text-sm font-mono resize-none"
+                                placeholder="Generated markdown table will appear here..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-end gap-3">
+                        <button onclick="closeTableEditor()" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">
+                            Cancel
+                        </button>
+                        <button onclick="insertTable()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            Insert Table
+                        </button>
                     </div>
                 </div>
             </div>
@@ -244,10 +366,19 @@
                 <div class="mb-4">
                     <div class="flex justify-between items-center mb-2">
                         <label class="text-sm text-gray-400">Content (Markdown supported)</label>
-                        <button onclick="togglePreview()" id="previewToggle" 
-                            class="text-blue-400 hover:text-blue-300 text-sm">
-                            Preview
-                        </button>
+                        <div class="flex gap-2">
+                            <button onclick="openTableEditor()" 
+                                class="text-green-400 hover:text-green-300 text-sm flex items-center gap-1">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18M8 4v16m8-16v16"></path>
+                                </svg>
+                                Table
+                            </button>
+                            <button onclick="togglePreview()" id="previewToggle" 
+                                class="text-blue-400 hover:text-blue-300 text-sm">
+                                Preview
+                            </button>
+                        </div>
                     </div>
                     <div class="relative">
                         <textarea id="postContent" 
@@ -1273,16 +1404,165 @@ console.log('Hello World');
             }
         }
 
+        // 테이블 에디터 함수들
+        let currentTableData = [];
+        let currentTableTarget = 'new'; // 'new' or 'edit'
+        
+        function openTableEditor() {
+            document.getElementById('tableEditorModal').classList.remove('hidden');
+            generateTable(); // 기본 3x3 테이블 생성
+        }
+        
+        function openTableEditorForEdit() {
+            currentTableTarget = 'edit';
+            openTableEditor();
+        }
+        
+        function closeTableEditor() {
+            document.getElementById('tableEditorModal').classList.add('hidden');
+            currentTableData = [];
+        }
+        
+        function generateTable() {
+            const rows = parseInt(document.getElementById('tableRows').value);
+            const cols = parseInt(document.getElementById('tableCols').value);
+            
+            // 테이블 데이터 초기화
+            currentTableData = [];
+            for (let i = 0; i < rows; i++) {
+                currentTableData[i] = [];
+                for (let j = 0; j < cols; j++) {
+                    currentTableData[i][j] = i === 0 ? `Header ${j + 1}` : '';
+                }
+            }
+            
+            renderTable();
+            updateMarkdownPreview();
+        }
+        
+        function renderTable() {
+            const tableEditor = document.getElementById('tableEditor');
+            let html = '<table class="w-full border-collapse">';
+            
+            currentTableData.forEach((row, rowIndex) => {
+                html += '<tr>';
+                row.forEach((cell, colIndex) => {
+                    const isHeader = rowIndex === 0;
+                    const tagName = isHeader ? 'th' : 'td';
+                    html += `<${tagName} class="border border-gray-600 p-2 ${isHeader ? 'bg-gray-700 font-semibold' : 'bg-gray-800'}">
+                        <input type="text" value="${cell}" 
+                            onchange="updateTableCell(${rowIndex}, ${colIndex}, this.value)"
+                            class="w-full bg-transparent text-white text-sm focus:outline-none focus:bg-gray-700 p-1 rounded">
+                    </${tagName}>`;
+                });
+                html += '</tr>';
+            });
+            
+            html += '</table>';
+            tableEditor.innerHTML = html;
+        }
+        
+        function updateTableCell(row, col, value) {
+            currentTableData[row][col] = value;
+            updateMarkdownPreview();
+        }
+        
+        function updateMarkdownPreview() {
+            if (currentTableData.length === 0) return;
+            
+            let markdown = '';
+            
+            // 헤더 행
+            markdown += '| ' + currentTableData[0].join(' | ') + ' |\n';
+            
+            // 구분선
+            markdown += '| ' + currentTableData[0].map(() => '---').join(' | ') + ' |\n';
+            
+            // 데이터 행들
+            for (let i = 1; i < currentTableData.length; i++) {
+                markdown += '| ' + currentTableData[i].join(' | ') + ' |\n';
+            }
+            
+            document.getElementById('tableMarkdown').value = markdown;
+        }
+        
+        function addTableRow() {
+            const cols = currentTableData[0]?.length || 3;
+            const newRow = new Array(cols).fill('');
+            currentTableData.push(newRow);
+            renderTable();
+            updateMarkdownPreview();
+        }
+        
+        function addTableColumn() {
+            currentTableData.forEach((row, index) => {
+                row.push(index === 0 ? `Header ${row.length + 1}` : '');
+            });
+            renderTable();
+            updateMarkdownPreview();
+        }
+        
+        function removeTableRow() {
+            if (currentTableData.length > 1) {
+                currentTableData.pop();
+                renderTable();
+                updateMarkdownPreview();
+            }
+        }
+        
+        function removeTableColumn() {
+            if (currentTableData[0]?.length > 1) {
+                currentTableData.forEach(row => row.pop());
+                renderTable();
+                updateMarkdownPreview();
+            }
+        }
+        
+        function insertTable() {
+            const markdown = document.getElementById('tableMarkdown').value;
+            let textarea;
+            
+            if (currentTableTarget === 'edit') {
+                textarea = document.getElementById('editNoteContent');
+            } else {
+                textarea = document.getElementById('postContent');
+            }
+            
+            const cursorPos = textarea.selectionStart;
+            const textBefore = textarea.value.substring(0, cursorPos);
+            const textAfter = textarea.value.substring(cursorPos);
+            
+            // 커서 위치에 테이블 삽입
+            textarea.value = textBefore + '\n\n' + markdown + '\n\n' + textAfter;
+            
+            // 미리보기 업데이트 (새 노트 작성 시에만)
+            if (currentTableTarget === 'new' && isPreviewMode) {
+                const html = marked.parse(textarea.value);
+                document.getElementById('markdownPreview').innerHTML = html;
+            }
+            
+            closeTableEditor();
+            currentTableTarget = 'new'; // 리셋
+            showStatus('Table inserted successfully!', 'success');
+        }
+
         // 모달 이벤트
         document.getElementById('noteModal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('noteModal')) {
                 closeNoteModal();
             }
         });
+        
+        document.getElementById('tableEditorModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('tableEditorModal')) {
+                closeTableEditor();
+            }
+        });
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeNoteModal();
+                closeTableEditor();
             }
         });
     </script>
