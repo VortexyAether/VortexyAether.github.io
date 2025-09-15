@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Public+Sans%3Awght%40400%3B500%3B700%3B900"
+    />
+    <title>Join DDFE Laboratory - Vortexy Aether</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="/js/loadComponents.js"></script>
+    <script src="/js/mobileMenu.js" defer></script>
+    <script src="/js/languageToggle.js" defer></script>
+  </head>
+  <body>
+    <div class="relative flex size-full min-h-screen flex-col bg-[#1a1a1a] dark group/design-root overflow-x-hidden" style='font-family: "Public Sans", "Noto Sans", sans-serif;'>
+      <div id="header"></div>
+
+      <main class="flex-grow">
+        <!-- Language Toggle (Only for this page) -->
+        <div class="px-4 sm:px-6 md:px-8 lg:px-40 flex justify-end py-4">
+          <button id="lang-toggle" class="px-4 py-2 bg-[#363636] text-white text-sm rounded hover:bg-[#4a4a4a] transition-colors">
+            <span id="lang-text">한국어</span>
+          </button>
+        </div>
+        
+        <!-- Hero Section -->
+        <div class="px-4 sm:px-6 md:px-8 lg:px-40 flex justify-center py-8">
+          <div class="max-w-[960px] w-full text-center">
+            <!-- English Version -->
+            <div data-lang="en">
+              <div class="mb-8">
+                <span class="px-3 py-1 bg-[#4F9BF4] rounded-full text-white text-sm font-medium">Data-Driven Fluid Engineering</span>
+              </div>
+              <h1 class="text-white text-5xl font-bold mb-6 leading-tight">Where Fluid Dynamics Meets Artificial Intelligence</h1>
+              <p class="text-[#adadad] text-xl mb-8 leading-relaxed">Accelerating CFD simulations through cutting-edge AI technologies</p>
+              <p class="text-[#adadad] text-lg mb-12 leading-relaxed max-w-4xl mx-auto">
+                We specialize in computational fluid dynamics, surrogate modeling, physics-informed neural networks, and automation to revolutionize how we understand and predict fluid behavior across industries.
+              </p>
+              <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="https://scholar.google.com/citations?user=ejt60CoAAAAJ&hl=en" target="_blank" rel="noopener noreferrer" class="px-6 py-3 bg-[#4F9BF4] text-white rounded-lg font-medium hover:bg-[#3A7BC8] transition-colors">Explore Research</a>
+                <a href="https://sites.google.com/view/ddfegroup/contact-us" target="_blank" rel="noopener noreferrer" class="px-6 py-3 border border-[#363636] text-white rounded-lg font-medium hover:bg-[#363636] transition-colors">Contact Us</a>
+              </div>
+            </div>
+            
+            <!-- Korean Version -->
+            <div data-lang="ko" style="display: none;">
+              <div class="mb-8">
+                <span class="px-3 py-1 bg-[#4F9BF4] rounded-full text-white text-sm font-medium">데이터 기반 유체 공학</span>
+              </div>
+              <h1 class="text-white text-5xl font-bold mb-6 leading-tight">유체역학과 인공지능의 만남</h1>
+              <p class="text-[#adadad] text-xl mb-8 leading-relaxed">최첨단 AI 기술로 CFD 시뮬레이션을 가속화합니다</p>
+              <p class="text-[#adadad] text-lg mb-12 leading-relaxed max-w-4xl mx-auto">
+                전산유체역학, 대리모델, 물리 기반 신경망, 자동화 분야를 전문으로 하여 산업 전반의 유체 거동을 이해하고 예측하는 방식을 혁신합니다.
+              </p>
+              <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="https://scholar.google.com/citations?user=ejt60CoAAAAJ&hl=en" target="_blank" rel="noopener noreferrer" class="px-6 py-3 bg-[#4F9BF4] text-white rounded-lg font-medium hover:bg-[#3A7BC8] transition-colors">연구 탐색하기</a>
+                <a href="https://sites.google.com/view/ddfegroup/contact-us" target="_blank" rel="noopener noreferrer" class="px-6 py-3 border border-[#363636] text-white rounded-lg font-medium hover:bg-[#363636] transition-colors">문의하기</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Research Areas -->
+        <div class="px-4 sm:px-6 md:px-8 lg:px-40 flex justify-center py-12 bg-[#0f0f0f]">
+          <div class="max-w-[960px] w-full">
+            <!-- English Version -->
+            <div data-lang="en">
+              <div class="text-center mb-12">
+                <span class="px-3 py-1 bg-[#363636] rounded-full text-[#adadad] text-sm font-medium">Our Research</span>
+                <h2 class="text-white text-4xl font-bold mt-4 mb-4">Advanced Research Areas</h2>
+              </div>
+            </div>
+            
+            <!-- Korean Version -->
+            <div data-lang="ko" style="display: none;">
+              <div class="text-center mb-12">
+                <span class="px-3 py-1 bg-[#363636] rounded-full text-[#adadad] text-sm font-medium">우리의 연구</span>
+                <h2 class="text-white text-4xl font-bold mt-4 mb-4">고급 연구 분야</h2>
+              </div>
+            </div>
+            
+            <!-- English Research Areas -->
+            <div data-lang="en" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div class="bg-[#1a1a1a] rounded-lg p-6 border border-[#363636]">
+                <h3 class="text-white text-xl font-bold mb-4">CFD Acceleration</h3>
+                <p class="text-[#adadad]">Developing surrogate models that dramatically reduce computational time for complex fluid simulations while maintaining high accuracy and reliability.</p>
+              </div>
+              
+              <div class="bg-[#1a1a1a] rounded-lg p-6 border border-[#363636]">
+                <h3 class="text-white text-xl font-bold mb-4">Physics-Informed Neural Networks</h3>
+                <p class="text-[#adadad]">Integrating fundamental physics laws directly into neural network architectures for more robust and interpretable AI models.</p>
+              </div>
+              
+              <div class="bg-[#1a1a1a] rounded-lg p-6 border border-[#363636]">
+                <h3 class="text-white text-xl font-bold mb-4">Turbulence Modeling</h3>
+                <p class="text-[#adadad]">Advanced AI techniques for understanding and predicting complex turbulent flows in various engineering applications.</p>
+              </div>
+              
+              <div class="bg-[#1a1a1a] rounded-lg p-6 border border-[#363636]">
+                <h3 class="text-white text-xl font-bold mb-4">Process Automation</h3>
+                <p class="text-[#adadad]">Automated workflows and intelligent systems that streamline CFD analysis from setup to results interpretation.</p>
+              </div>
+              
+              <div class="bg-[#1a1a1a] rounded-lg p-6 border border-[#363636]">
+                <h3 class="text-white text-xl font-bold mb-4">Navier-Stokes Solutions</h3>
+                <p class="text-[#adadad]">Deep understanding and novel approaches to solving the fundamental equations governing fluid motion.</p>
+              </div>
+              
+              <div class="bg-[#1a1a1a] rounded-lg p-6 border border-[#363636]">
+                <h3 class="text-white text-xl font-bold mb-4">Multi-Physics Coupling</h3>
+                <p class="text-[#adadad]">Integrating fluid dynamics with heat transfer, structural mechanics, and electromagnetic phenomena.</p>
+              </div>
+            </div>
+            
+            <!-- Korean Research Areas -->
+            <div data-lang="ko" style="display: none;" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div class="bg-[#1a1a1a] rounded-lg p-6 border border-[#363636]">
+                <h3 class="text-white text-xl font-bold mb-4">CFD 가속화</h3>
+                <p class="text-[#adadad]">높은 정확도와 신뢰성을 유지하면서 복잡한 유체 시뮬레이션의 계산 시간을 획기적으로 단축하는 대리모델을 개발합니다.</p>
+              </div>
+              
+              <div class="bg-[#1a1a1a] rounded-lg p-6 border border-[#363636]">
+                <h3 class="text-white text-xl font-bold mb-4">물리 기반 신경망</h3>
+                <p class="text-[#adadad]">보다 견고하고 해석 가능한 AI 모델을 위해 기본 물리 법칙을 신경망 아키텍처에 직접 통합합니다.</p>
+              </div>
+              
+              <div class="bg-[#1a1a1a] rounded-lg p-6 border border-[#363636]">
+                <h3 class="text-white text-xl font-bold mb-4">난류 모델링</h3>
+                <p class="text-[#adadad]">다양한 공학 응용에서 복잡한 난류 흐름을 이해하고 예측하기 위한 고급 AI 기법을 연구합니다.</p>
+              </div>
+              
+              <div class="bg-[#1a1a1a] rounded-lg p-6 border border-[#363636]">
+                <h3 class="text-white text-xl font-bold mb-4">프로세스 자동화</h3>
+                <p class="text-[#adadad]">설정부터 결과 해석까지 CFD 분석을 간소화하는 자동화된 워크플로우와 지능형 시스템을 개발합니다.</p>
+              </div>
+              
+              <div class="bg-[#1a1a1a] rounded-lg p-6 border border-[#363636]">
+                <h3 class="text-white text-xl font-bold mb-4">Navier-Stokes 해법</h3>
+                <p class="text-[#adadad]">유체 운동을 지배하는 기본 방정식을 해결하기 위한 깊은 이해와 새로운 접근 방식을 연구합니다.</p>
+              </div>
+              
+              <div class="bg-[#1a1a1a] rounded-lg p-6 border border-[#363636]">
+                <h3 class="text-white text-xl font-bold mb-4">다중 물리 융합</h3>
+                <p class="text-[#adadad]">열전달, 구조역학, 전자기 현상이 동반되는 유체현상을 연구합니다.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Industry Applications -->
+        <div class="px-4 sm:px-6 md:px-8 lg:px-40 flex justify-center py-12">
+          <div class="max-w-[960px] w-full">
+            <!-- English Version -->
+            <div data-lang="en">
+              <div class="text-center mb-12">
+                <span class="px-3 py-1 bg-[#363636] rounded-full text-[#adadad] text-sm font-medium">Applications</span>
+                <h2 class="text-white text-4xl font-bold mt-4 mb-4">Industry Impact</h2>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-[#363636] rounded-lg p-8">
+                  <h3 class="text-white text-xl font-bold mb-4">Energy Systems</h3>
+                  <p class="text-[#adadad] mb-4">Renewable energy optimization, Nuclear power plants, heat exchangers, and energy storage systems</p>
+                </div>
+                
+                <div class="bg-[#363636] rounded-lg p-8">
+                  <h3 class="text-white text-xl font-bold mb-4">Semiconductor</h3>
+                  <p class="text-[#adadad] mb-4">Chip cooling, manufacturing process optimization, thermal management, and clean room design</p>
+                </div>
+                
+                <div class="bg-[#363636] rounded-lg p-8">
+                  <h3 class="text-white text-xl font-bold mb-4">Mobility</h3>
+                  <p class="text-[#adadad] mb-4">Automotive aerodynamics, electric vehicle thermal systems, propulsion, and autonomous vehicle sensors</p>
+                </div>
+                
+                <div class="bg-[#363636] rounded-lg p-8">
+                  <h3 class="text-white text-xl font-bold mb-4">Aerospace</h3>
+                  <p class="text-[#adadad] mb-4">Aircraft design, propulsion systems, rocket engines, and atmospheric re-entry vehicles</p>
+                </div>
+                
+                <div class="bg-[#363636] rounded-lg p-8">
+                  <h3 class="text-white text-xl font-bold mb-4">Manufacturing</h3>
+                  <p class="text-[#adadad] mb-4">Process optimization, quality control, materials processing, and industrial automation</p>
+                </div>
+                
+                <div class="bg-[#363636] rounded-lg p-8">
+                  <h3 class="text-white text-xl font-bold mb-4">Environmental</h3>
+                  <p class="text-[#adadad] mb-4">Climate modeling, ocean dynamics, atmospheric flows, and environmental impact assessment</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Korean Version -->
+            <div data-lang="ko" style="display: none;">
+              <div class="text-center mb-12">
+                <span class="px-3 py-1 bg-[#363636] rounded-full text-[#adadad] text-sm font-medium">응용 분야</span>
+                <h2 class="text-white text-4xl font-bold mt-4 mb-4">산업 응용</h2>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-[#363636] rounded-lg p-8">
+                  <h3 class="text-white text-xl font-bold mb-4">에너지 시스템</h3>
+                  <p class="text-[#adadad] mb-4">신재생 에너지 최적화, 원자력 발전, 열교환기, 에너지 저장 시스템</p>
+                </div>
+
+                <div class="bg-[#363636] rounded-lg p-8">
+                  <h3 class="text-white text-xl font-bold mb-4">반도체</h3>
+                  <p class="text-[#adadad] mb-4">칩 냉각, 제조 공정 최적화, 열관리, 클린룸 설계</p>
+                </div>
+
+                <div class="bg-[#363636] rounded-lg p-8">
+                  <h3 class="text-white text-xl font-bold mb-4">모빌리티</h3>
+                  <p class="text-[#adadad] mb-4">자동차 공기역학, 전기차 열관리 시스템, 추진 시스템, 자율주행 센서</p>
+                </div>
+                
+                <div class="bg-[#363636] rounded-lg p-8">
+                  <h3 class="text-white text-xl font-bold mb-4">항공우주</h3>
+                  <p class="text-[#adadad] mb-4">항공기 설계, 추진 시스템, 로켓 엔진, 대기권 재진입 비행체</p>
+                </div>
+                
+                <div class="bg-[#363636] rounded-lg p-8">
+                  <h3 class="text-white text-xl font-bold mb-4">제조업</h3>
+                  <p class="text-[#adadad] mb-4">공정 최적화, 품질 관리, 소재 가공, 산업 자동화</p>
+                </div>
+                
+                <div class="bg-[#363636] rounded-lg p-8">
+                  <h3 class="text-white text-xl font-bold mb-4">환경</h3>
+                  <p class="text-[#adadad] mb-4">기후 모델링, 해양 역학, 대기 흐름, 환경 영향 평가</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Opportunities & Future -->
+        <div class="px-4 sm:px-6 md:px-8 lg:px-40 flex justify-center py-12 bg-[#0f0f0f]">
+          <div class="max-w-[960px] w-full">
+            <!-- English Version -->
+            <div data-lang="en">
+              <div class="text-center mb-12">
+                <span class="px-3 py-1 bg-[#363636] rounded-full text-[#adadad] text-sm font-medium">Future Opportunities</span>
+                <h2 class="text-white text-4xl font-bold mt-4 mb-4">Why Join DDFE?</h2>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-[#1a1a1a] rounded-lg p-8 border border-[#363636]">
+                  <h3 class="text-white text-xl font-bold mb-4">Growing Demand</h3>
+                  <p class="text-[#adadad]">Korean companies are rapidly increasing recruitment of CFD+AI specialists with advanced degrees</p>
+                </div>
+                
+                <div class="bg-[#1a1a1a] rounded-lg p-8 border border-[#363636]">
+                  <h3 class="text-white text-xl font-bold mb-4">Global Recognition</h3>
+                  <p class="text-[#adadad]">International research community has enormous expectations for fluid dynamics and AI convergence</p>
+                </div>
+                
+                <div class="bg-[#1a1a1a] rounded-lg p-8 border border-[#363636]">
+                  <h3 class="text-white text-xl font-bold mb-4">Core Technology</h3>
+                  <p class="text-[#adadad]">Master the fundamental principles of energy transport through fluids - nature's primary medium</p>
+                </div>
+                
+                <div class="bg-[#1a1a1a] rounded-lg p-8 border border-[#363636]">
+                  <h3 class="text-white text-xl font-bold mb-4">Deep Knowledge</h3>
+                  <p class="text-[#adadad]">Gain comprehensive understanding of Navier-Stokes equations and advanced fluid mechanics</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Korean Version -->
+            <div data-lang="ko" style="display: none;">
+              <div class="text-center mb-12">
+                <span class="px-3 py-1 bg-[#363636] rounded-full text-[#adadad] text-sm font-medium">Future Opportunities</span>
+                <h2 class="text-white text-4xl font-bold mt-4 mb-4">Why Join DDFE?</h2>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-[#1a1a1a] rounded-lg p-8 border border-[#363636]">
+                  <h3 class="text-white text-xl font-bold mb-4">증가하는 수요</h3>
+                  <p class="text-[#adadad]">국내 기업들의 석-박사 학위를 가진 CFD+AI 전문가 채용을 급</p>
+                </div>
+                
+                <div class="bg-[#1a1a1a] rounded-lg p-8 border border-[#363636]">
+                  <h3 class="text-white text-xl font-bold mb-4">글로벌 수요</h3증>
+                  <p class="text-[#adadad]">국제 연구 커뮤니티는 유체역학과 AI 융합에 대한 엄청난 기대를 가지고 있습니다</p>
+                </div>
+                
+                <div class="bg-[#1a1a1a] rounded-lg p-8 border border-[#363636]">
+                  <h3 class="text-white text-xl font-bold mb-4">핵심 기술</h3>
+                  <p class="text-[#adadad]">에너지 전달의 주요 매개체인 유체를 통한 시스템 엔지니어링</p>
+                </div>
+
+                <div class="bg-[#1a1a1a] rounded-lg p-8 border border-[#363636]">
+                  <h3 class="text-white text-xl font-bold mb-4">전문적 지식</h3>
+                  <p class="text-[#adadad]">나비에-스토크스 방정식과 고급 유체역학에 대한 포괄적인 이해를 얻으세요</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Closing CTA -->
+        <div class="px-4 sm:px-6 md:px-8 lg:px-40 flex justify-center py-16">
+          <div class="max-w-[960px] w-full text-center">
+            <!-- English Version -->
+            <div data-lang="en">
+              <h2 class="text-white text-4xl font-bold mb-6">Ready to Shape the Future?</h2>
+              <p class="text-[#adadad] text-xl mb-8">Join DDFE Laboratory and become part of groundbreaking research that bridges fluid dynamics and artificial intelligence.</p>
+              <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button class="px-8 py-4 bg-[#4F9BF4] text-white rounded-lg font-medium text-lg hover:bg-[#3A7BC8] transition-colors">Join Our Lab</button>
+                <button class="px-8 py-4 border border-[#363636] text-white rounded-lg font-medium text-lg hover:bg-[#363636] transition-colors">Learn More</button>
+              </div>
+            </div>
+            
+            <!-- Korean Version -->
+            <div data-lang="ko" style="display: none;">
+              <h2 class="text-white text-4xl font-bold mb-6">미래를 만들 준비가 되셨나요?</h2>
+              <p class="text-[#adadad] text-xl mb-8">DDFE 연구실에 합류하여 유체역학과 인공지능을 연결하는 획기적인 연구의 일부가 되어보세요.</p>
+              <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button class="px-8 py-4 bg-[#4F9BF4] text-white rounded-lg font-medium text-lg hover:bg-[#3A7BC8] transition-colors">연구실 참여하기</button>
+                <button class="px-8 py-4 border border-[#363636] text-white rounded-lg font-medium text-lg hover:bg-[#363636] transition-colors">더 알아보기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <div id="footer"></div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        loadComponent('header', '/components/header.html');
+        loadComponent('footer', '/components/footer.html');
+      });
+    </script>
+  </body>
+</html>
