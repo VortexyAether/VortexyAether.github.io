@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Public+Sans%3Awght%40400%3B500%3B700%3B900" />
+    <title>VA Edu — Vortexy Aether</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="/js/loadComponents.js"></script>
+    <script src="/js/mobileMenu.js" defer></script>
+  </head>
+  <body>
+    <div class="relative flex size-full min-h-screen flex-col bg-[#1a1a1a] dark group/design-root overflow-x-hidden" style='font-family: "Public Sans", "Noto Sans", sans-serif;'>
+      <div id="header"></div>
+      <main class="flex-grow px-4 sm:px-6 md:px-8 lg:px-40 py-8 flex justify-center">
+        <article class="w-full max-w-[960px]">
+          <div class="rounded-2xl overflow-hidden border border-[#363636] bg-[#242424]">
+            <img src="/va_edu/assets/site-preview.svg" alt="VA Edu preview" class="w-full bg-[#111] object-cover" />
+            <div class="p-8">
+              <p class="text-[#4F9BF4] text-sm font-bold uppercase tracking-[0.2em] mb-3">Interactive Education</p>
+              <h1 class="text-white text-4xl font-black mb-4">VA Edu — Fluid Lab</h1>
+              <p class="text-[#adadad] text-lg leading-8 mb-6">
+                유체역학을 직관·그림·식·슬라이더로 함께 보는 웹 기반 교육 플랫폼입니다.
+                정수압, 점성, hydraulic jump, 내부/외부유동을 브라우저에서 바로 탐색할 수 있게 구성했습니다.
+              </p>
+              <div class="flex flex-wrap gap-3 mb-8">
+                <span class="px-3 py-1 rounded-full bg-[#1a1a1a] text-[#adadad] text-sm">Fluid Mechanics</span>
+                <span class="px-3 py-1 rounded-full bg-[#1a1a1a] text-[#adadad] text-sm">Interactive Lab</span>
+                <span class="px-3 py-1 rounded-full bg-[#1a1a1a] text-[#adadad] text-sm">Education</span>
+                <span class="px-3 py-1 rounded-full bg-[#1a1a1a] text-[#adadad] text-sm">GitHub Pages</span>
+              </div>
+              <div class="flex flex-wrap gap-4">
+                <a href="/va_edu/" class="inline-flex items-center justify-center rounded-lg bg-[#4F9BF4] px-6 py-3 text-white font-bold hover:bg-[#3A7BC8] transition-colors">Open VA Edu</a>
+                <a href="https://github.com/VortexyAether/VA_edu.github.io" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-lg border border-[#4F9BF4] px-6 py-3 text-[#4F9BF4] font-bold hover:bg-[#26384f] transition-colors">GitHub Repo</a>
+              </div>
+            </div>
+          </div>
+        </article>
+      </main>
+      <div id="footer"></div>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        loadComponent('header', '/components/header.html');
+        loadComponent('footer', '/components/footer.html');
+      });
+    </script>
+  </body>
+</html>

@@ -1,13 +1,33 @@
 {
   "projects": [
     {
+      "id": "va_edu",
+      "title": "VA Edu — Fluid Lab",
+      "summary": "Interactive Korean-first fluid mechanics education platform with visual explanations, equations, and sliders.",
+      "image": "/va_edu/assets/site-preview.svg",
+      "content": "/va_edu/README.md",
+      "category": "Education",
+      "techStack": [
+        "Fluid Mechanics",
+        "JavaScript",
+        "Interactive Web",
+        "Education"
+      ]
+    },
+    {
       "id": "under_graduated",
       "title": "My beautiful Undergraduate",
       "summary": "A collection of my undergraduate projects and experiences",
       "image": "/projects/under_graduated/object_detection.gif",
       "content": "/projects/under_graduated/index.md",
       "category": "Project",
-      "techStack": ["YOLO", "Python1", "PINN", "OpenCV", "NodeRED"]
+      "techStack": [
+        "YOLO",
+        "Python1",
+        "PINN",
+        "OpenCV",
+        "NodeRED"
+      ]
     }
   ]
 }

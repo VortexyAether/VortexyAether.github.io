@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <defs><linearGradient id="bg" x1="0" x2="1"><stop stop-color="#08111f"/><stop offset="1" stop-color="#12345a"/></linearGradient></defs>
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <text x="70" y="105" fill="#a7f3d0" font-family="monospace" font-size="24">VA Fluid Lab</text>
+  <text x="70" y="165" fill="#eaf2ff" font-family="system-ui, sans-serif" font-size="58" font-weight="700">유체역학을 보이는 것으로</text>
+  <text x="70" y="220" fill="#a9b8cc" font-family="system-ui, sans-serif" font-size="28">Hydrostatics · Viscosity · Hydraulic Jump · Internal / External Flow</text>
+  <g transform="translate(80 310)">
+    <rect width="300" height="250" rx="24" fill="#101c2f" stroke="#243650"/>
+    <text x="28" y="55" fill="#eaf2ff" font-size="28" font-family="system-ui">p = p₀ + ρgh</text>
+    <rect x="55" y="80" width="120" height="130" fill="#0ea5e977" stroke="#9bdcff"/>
+    <path d="M175 105 h70 M175 145 h95 M175 185 h120" stroke="#a7f3d0" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(450 310)">
+    <rect width="300" height="250" rx="24" fill="#101c2f" stroke="#243650"/>
+    <text x="28" y="55" fill="#eaf2ff" font-size="28" font-family="system-ui">Hydraulic Jump</text>
+    <path d="M35 190 C110 190,150 190,170 135 C195 80,230 105,270 105 L270 220 L35 220 Z" fill="#0ea5e977"/>
+    <path d="M55 170 h90 M205 135 h45" stroke="#fbbf24" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(820 310)">
+    <rect width="300" height="250" rx="24" fill="#101c2f" stroke="#243650"/>
+    <text x="28" y="55" fill="#eaf2ff" font-size="25" font-family="system-ui">Machinery Studio</text>
+    <circle cx="150" cy="145" r="72" fill="none" stroke="#64d8ff" stroke-width="6"/>
+    <path d="M150 145 C178 72,213 75,191 132 C260 148,260 184,188 170 C163 237,128 234,110 176 C42 158,42 122,112 120 Z" fill="#dbeafe" stroke="#a7f3d0" stroke-width="3"/>
+    <text x="58" y="225" fill="#a9b8cc" font-size="20" font-family="system-ui">thrust · torque · power</text>
+  </g>
+</svg>

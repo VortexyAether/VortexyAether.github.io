@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VA Fluid Lab — 유체를 눈으로 이해하기</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">VA Fluid Lab / overnight prototype</p>
+      <h1>유체역학을 “보이는 것”으로 바꾸는 작은 실험실</h1>
+      <p class="lead">정수압, 점성, hydraulic jump, 내부/외부유동을 직관·그림·식·슬라이더로 한 번에 보는 로컬 교육 페이지. Korean-first, equation-light, but physically honest.</p>
+      <div class="hero-actions">
+        <a href="#hydrostatics">바로 시작</a>
+        <a href="#studio">Fluid Machinery Studio</a>
+      </div>
+    </div>
+    <canvas id="heroFlow" width="520" height="300" aria-label="flow particles"></canvas>
+  </header>
+
+  <nav class="toc">
+    <a href="#hydrostatics">Hydrostatics</a>
+    <a href="#viscosity">Viscosity</a>
+    <a href="#jump">Hydraulic Jump</a>
+    <a href="#internal">Internal Flow</a>
+    <a href="#external">External Flow</a>
+    <a href="#path">Learning Path</a>
+    <a href="#studio">Machinery Studio</a>
+  </nav>
+
+  <main>
+    <section id="path" class="card tour-card">
+      <p class="eyebrow">3-minute morning tour</p>
+      <h2>아침에 이렇게 보면 된다</h2>
+      <ol>
+        <li><b>슬라이더를 끝까지 움직여보기</b> — 숫자가 식에서 어디에 들어가는지 바로 보인다.</li>
+        <li><b>그림의 화살표 변화 보기</b> — 압력·속도·wake가 커지거나 작아지는 감각을 먼저 잡는다.</li>
+        <li><b>각 카드의 “한 번 물어보기” 버튼</b> — 공식 암기 대신 원인/결과를 확인한다.</li>
+      </ol>
+      <p class="note">범위: 학습용 1차 근사다. 실제 설계에는 단위 확인, 물성치, 형상, 시험 데이터 검증이 추가로 필요하다. 그래도 직관을 만드는 데는 충분히 쓸 만하다.</p>
+      <div class="path-list">
+        <div><b>1 압력</b><span>깊이 h가 압력을 만든다.</span></div>
+        <div><b>2 전단</b><span>벽면 no-slip이 속도구배를 만든다.</span></div>
+        <div><b>3 무차원수</b><span>Re와 Fr가 유동 성격을 먼저 가른다.</span></div>
+        <div><b>4 항력</b><span>압력분포와 전단응력의 합이 힘이다.</span></div>
+      </div>
+    </section>
+
+    <section id="hydrostatics" class="card topic">
+      <div class="copy">
+        <h2>1. 정수압: 깊을수록 압력이 커진다</h2>
+        <p>정지한 유체에서는 전단응력이 없고, 압력은 방향과 무관하게 작용한다. 물속으로 내려갈수록 위에 얹힌 물기둥의 무게가 커져 압력이 선형으로 증가한다.</p>
+        <div class="equation">p = p₀ + ρ g h</div>
+        <p class="intuition">감각: 같은 구멍이라도 아래쪽 구멍에서 물줄기가 더 멀리 나간다. 이유는 아래쪽의 <b>수두 h</b>가 더 크기 때문.</p>
+        <label>수심 h: <output id="depthOut">3.0</output> m <input id="depth" type="range" min="0" max="10" step="0.1" value="3"></label>
+        <label>밀도 ρ: <output id="rhoOut">1000</output> kg/m³ <input id="rho" type="range" min="700" max="1300" step="10" value="1000"></label>
+        <label>표시 배율: <output id="manometerOut">1.0</output>x <input id="manometerScale" type="range" min="0.2" max="1.8" step="0.1" value="1"></label>
+        <p class="result">게이지 압력: <b id="pGauge">29.4 kPa</b> / 절대압: <b id="pAbs">130.7 kPa</b> / 같은 유체 피에조미터 수두: <b id="headOut">3.0 m</b></p>
+        <details class="confusion"><summary>학생들이 자주 헷갈리는 점</summary><p>정수압은 아래 방향으로만 작용하지 않는다. 같은 깊이의 한 점에서는 모든 방향 압력이 같고, 깊이에 따라 크기만 선형으로 달라진다.</p></details>
+        <button class="check" data-answer="수심 h가 2배가 되면 ρ와 g가 같을 때 게이지 압력도 정확히 2배가 된다. 정수압은 깊이에 선형 비례한다.">한 번 물어보기: 수심을 2배로 하면?</button>
+        <p class="answer" aria-live="polite"></p>
+      </div>
+      <div class="viz"><canvas id="hydroCanvas" width="460" height="360"></canvas></div>
+    </section>
+
+    <section id="viscosity" class="card topic alt">
+      <div class="copy">
+        <h2>2. 점성: 유체의 “층 사이 마찰”</h2>
+        <p>점성은 유체가 변형률에 저항하는 정도다. 위 판을 움직이면 벽면의 no-slip 조건 때문에 속도는 아래 0에서 위 U까지 층층이 바뀐다.</p>
+        <div class="equation">Couette: τ = μU/H · Poiseuille: τw = 4μUmax/H</div>
+        <p class="intuition">물은 쉽게 미끄러지고, 꿀은 느리다. 둘 다 유체지만 <b>μ</b>가 다르다.</p>
+        <label>대표 속도 U: <output id="uOut">1.0</output> m/s <input id="uPlate" type="range" min="0" max="3" step="0.1" value="1"></label>
+        <label>간격 H: <output id="hOut">10</output> mm <input id="gap" type="range" min="2" max="40" step="1" value="10"></label>
+        <label>점도 μ: <output id="muOut">1.0</output> mPa·s <input id="mu" type="range" min="0.5" max="100" step="0.5" value="1"></label>
+        <label>속도분포: <select id="viscMode"><option value="couette" selected>Couette: 움직이는 윗판, U=plate speed</option><option value="poiseuille">Plane Poiseuille: 압력구배, U=maximum speed</option></select></label>
+        <p class="result">전단응력 τ ≈ <b id="tau">0.10 Pa</b></p>
+        <details class="confusion"><summary>왜 no-slip이 중요한가?</summary><p>벽 바로 옆 유체 속도는 벽 속도와 같다고 본다. 그래서 벽 근처 속도구배가 전단응력과 압력손실의 시작점이 된다.</p></details>
+        <button class="check" data-answer="간격 H가 작아지면 같은 속도 U에서도 속도 기울기 U/H가 커진다. 그래서 층 사이 마찰, 즉 전단응력이 커진다.">한 번 물어보기: 판 간격을 줄이면?</button>
+        <p class="answer" aria-live="polite"></p>
+      </div>
+      <div class="viz"><canvas id="viscCanvas" width="460" height="360"></canvas></div>
+    </section>
+
+    <section id="jump" class="card topic">
+      <div class="copy">
+        <h2>3. Hydraulic Jump: 얕고 빠른 흐름이 깊고 느린 흐름으로 “튀어오르는” 순간</h2>
+        <p>직사각형 수로에서 초임계 흐름(Fr &gt; 1)이 에너지를 잃으며 아임계 흐름(Fr &lt; 1)으로 바뀔 때 hydraulic jump가 생긴다. 싱크대의 둥근 jump는 좋은 직관 예시지만, 아래 식은 1D 직사각형 수로 근사다.</p>
+        <div class="equation">Fr₁ = V₁ / √(g y₁), &nbsp; y₂/y₁ = ½(√(1+8Fr₁²)-1)</div>
+        <label>상류 수심 y₁: <output id="y1Out">0.08</output> m <input id="y1" type="range" min="0.02" max="0.30" step="0.01" value="0.08"></label>
+        <label>상류 속도 V₁: <output id="v1Out">3.0</output> m/s <input id="v1" type="range" min="0.2" max="8" step="0.1" value="3"></label>
+        <p class="result">Fr₁: <b id="fr1">3.39</b>, 예측 y₂: <b id="y2">0.35 m</b>, 에너지 손실: <b id="loss">0.25 m</b></p>
+        <button class="check" data-answer="Fr₁가 1보다 커야 얕고 빠른 초임계 흐름이다. 이 조건에서만 고전적인 hydraulic jump가 성립한다.">한 번 물어보기: jump의 첫 조건은?</button>
+        <p class="answer" aria-live="polite"></p>
+      </div>
+      <div class="viz"><canvas id="jumpCanvas" width="520" height="340"></canvas></div>
+    </section>
+
+    <section id="internal" class="card topic alt">
+      <div class="copy">
+        <h2>4. 내부유동: 파이프 안에서는 Reynolds 수가 먼저다</h2>
+        <p>관 내부 유동은 벽 마찰과 단면 평균속도가 지배한다. 층류/난류 판단은 보통 Reynolds 수로 시작한다.</p>
+        <div class="equation">Re = ρ V D / μ, &nbsp; Δp = f (L/D) ρV²/2</div>
+        <label>직경 D: <output id="dOut">20</output> mm <input id="diam" type="range" min="2" max="100" step="1" value="20"></label>
+        <label>평균속도 V: <output id="pipeVOut">1.0</output> m/s <input id="pipeV" type="range" min="0.05" max="8" step="0.05" value="1"></label>
+        <label>길이 L: <output id="lOut">5</output> m <input id="pipeL" type="range" min="0.5" max="50" step="0.5" value="5"></label>
+        <label>상대거칠기 ε/D: <output id="roughOut">0.0010</output> <input id="roughness" type="range" min="0" max="0.02" step="0.0005" value="0.001"></label>
+        <p class="result">Re: <b id="rePipe">19900</b> → <b id="regime">난류 가능</b>, Darcy-Weisbach 압력손실: <b id="dpPipe">1.5 kPa</b></p>
+        <p class="note">마찰계수: 층류는 64/Re, 난류는 Swamee-Jain 근사. 천이영역(대략 Re 2300–4000)은 교육용 보간이라 실제 관 조건에 민감하다.</p>
+        <button class="check" data-answer="Re는 관성력과 점성력의 비율이다. 값이 크면 관성이 우세해 작은 교란이 커지고 난류가 되기 쉬워진다.">한 번 물어보기: Reynolds 수가 왜 중요할까?</button>
+        <p class="answer" aria-live="polite"></p>
+      </div>
+      <div class="viz"><canvas id="pipeCanvas" width="520" height="320"></canvas></div>
+    </section>
+
+    <section id="external" class="card topic">
+      <div class="copy">
+        <h2>5. 외부유동: 물체 밖에서는 경계층·박리·항력이 핵심</h2>
+        <p>외부유동은 물체 형상 주위로 유체가 돌아가며 생기는 압력분포와 전단응력의 합이다. 같은 면적이어도 유선형이면 박리가 늦어져 항력이 작아진다.</p>
+        <div class="equation">Fᴅ = ½ ρ V² Cᴅ A</div>
+        <p class="note">Cd는 대표값이다. 실제 Cd는 Reynolds 수, 표면 거칠기, 자세각, 압축성에 따라 달라진다.</p>
+        <label>속도 V: <output id="extVOut">15</output> m/s <input id="extV" type="range" min="1" max="60" step="1" value="15"></label>
+        <label>면적 A: <output id="areaOut">0.04</output> m² <input id="area" type="range" min="0.005" max="0.2" step="0.005" value="0.04"></label>
+        <label>형상: <select id="shape"><option value="1.1">평판/둔한 물체 Cd≈1.1</option><option value="0.47">구 Cd≈0.47</option><option value="0.08" selected>유선형 Cd≈0.08</option></select></label>
+        <label>특성길이 L: <output id="extLOut">0.20</output> m <input id="extL" type="range" min="0.03" max="1.2" step="0.01" value="0.20"></label>
+        <p class="result">예상 항력: <b id="drag">0.44 N</b> / 외부유동 Re: <b id="reExt">203k</b></p>
+        <button class="check" data-answer="항력은 V²에 비례한다. 속도를 2배로 하면 같은 Cd와 면적에서 항력은 약 4배가 된다. 자연은 고속에서 제법 비싸게 청구한다.">한 번 물어보기: 속도를 2배로 하면?</button>
+        <p class="answer" aria-live="polite"></p>
+      </div>
+      <div class="viz"><canvas id="extCanvas" width="520" height="320"></canvas></div>
+    </section>
+
+    <section id="studio" class="card studio-card">
+      <p class="eyebrow">Second deliverable</p>
+      <h2>Fluid Machinery Studio: 예비 설계 감각을 만드는 GUI</h2>
+      <p>두 번째 산출물은 오픈소스 유체기계 설계 학습용 sizing GUI다. CFD나 검증된 BEM solver가 아니라, 75% 반경의 단일 blade-element heuristic으로 chord, pitch, radius, rpm, flow speed, blade count에서 추력·토크·동력·효율 감각을 빠르게 보여준다.</p>
+      <div class="studio-grid">
+        <div class="studio-controls">
+          <label>Chord c: <output id="bladeChordOut">45</output> mm <input id="bladeChord" type="range" min="12" max="140" step="1" value="45"></label>
+          <label>Pitch angle β: <output id="bladePitchOut">18</output> deg <input id="bladePitch" type="range" min="4" max="42" step="1" value="18"></label>
+          <label>Radius R: <output id="bladeRadiusOut">0.18</output> m <input id="bladeRadius" type="range" min="0.04" max="0.60" step="0.01" value="0.18"></label>
+          <label>RPM: <output id="rpmOut">3200</output> <input id="rpm" type="range" min="300" max="12000" step="100" value="3200"></label>
+          <label>Flow speed V∞: <output id="flowSpeedOut">8.0</output> m/s <input id="flowSpeed" type="range" min="0" max="45" step="0.5" value="8"></label>
+          <label>Blade count B: <output id="bladeCountOut">3</output> <input id="bladeCount" type="range" min="2" max="8" step="1" value="3"></label>
+        </div>
+        <div class="studio-results">
+          <div class="metric-row"><span>Thrust</span><b id="studioThrust">0.0 N</b></div>
+          <div class="metric-row"><span>Torque</span><b id="studioTorque">0.00 N·m</b></div>
+          <div class="metric-row"><span>Shaft power</span><b id="studioPower">0 W</b></div>
+          <div class="metric-row"><span>Propulsive efficiency</span><b id="studioEta">0%</b></div>
+          <p id="studioWarnings" class="warning-list" aria-live="polite"></p>
+          <p class="note">모델: 반경 75% 지점의 단일 blade element, 단순 양력곡선, local solidity σ=Bc/(2πr), 대표 drag polar를 섞은 교육용 추정이다. 유도속도, tip loss, twist, radial integration, 실제 airfoil polar는 빠져 있다.</p>
+        </div>
+      </div>
+      <div class="viz studio-viz"><canvas id="studioCanvas" width="980" height="320"></canvas></div>
+      <p class="note">확장 방향: CSV export, 공개 성능 데이터와 비교, 실제 BEM/radial integration, 선택적 CAD/solver wrapper는 나중 단계로 둘 수 있다. 지금 핵심은 preliminary design intuition이다.</p>
+    </section>
+  </main>
+
+  <footer>Built locally for VA. No tracking, no external dependencies, just fluids behaving badly in a browser.</footer>
+  <script src="assets/fluid-lab.js"></script>
+</body>
+</html>
