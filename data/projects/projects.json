@@ -3,7 +3,7 @@
     {
       "id": "va_edu",
       "title": "VA Edu — Fluid Lab",
-      "summary": "Interactive Korean-first fluid mechanics education platform with visual explanations, equations, and sliders.",
+      "summary": "A browser-based fluid mechanics lab with visual explanations, equations, and interactive sliders.",
       "image": "/va_edu/assets/site-preview.svg",
       "content": "/va_edu/README.md",
       "category": "Education",
